@@ -8,4 +8,6 @@ All ruby code developped using [IntelliJ IDEA](http://www.jetbrains.com/idea/) w
 
 ***
 
-* tools.rb : generate a podcast rss from a list of mp3 in a directory
+* podcast.rb : generate a podcast rss from a list of mp3 in a directory
+* parallel_downloader.rb : download a list of files from their url in parallel
+* flattener.rb : flatten a directory tree by adding the directory names to the files
