@@ -1,5 +1,5 @@
-# Get images cbr and zip files in a directory recursively
-# And put them in cbr files with a fixed number of images per files
+# Get images cbz and zip files in a directory recursively
+# And put them in cbz files with a fixed number of images per files
 
 require 'rubygems'
 require 'zip/zip'
