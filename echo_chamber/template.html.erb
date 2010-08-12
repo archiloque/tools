@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <title>Echo Chamber, information for <%= @user_name %></title>
+  <style type="text/css">
+    body {
+      font-family: Verdana, Arial, Helvetica, sans-serif;
+      color: black;
+      background-color: white;
+      font-size: 12px;
+      padding: 0 0 0 5px;
+      margin: 0;
+    }
+
+    h1 {
+      font-weight: normal;
+      font-size: 20px;
+      padding-top: 10px;
+      padding-bottom: 5px
+    }
+
+    table {
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      font-weight: normal;
+    }
+
+    table img {
+      width: 20px;
+    }
+
+    .bordered td {
+      border: 1px solid #aaaaaa;
+    }
+
+    th, td {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+  </style>
+</head>
+<body>
+<h1>Echo Chamber, information for <%= @user_name %></h1>
+<table>
+  <tr>
+    <td><img src="<%= @user_profile_image_url %>"/></td>
+    <td>
+      Follows <%= @user_friends_count %>
+      <br/>
+      Is followed by <%= @user_followers_count %>
+      <br/>
+      <%= @user_followed_that_follow %> of your followers follow you
+    </td>
+  </tr>
+</table>
+
+<h1>People you follow</h1>
+<table class="bordered">
+  <thead>
+  <tr>
+    <th></th>
+    <th>Id</th>
+    <th>User</th>
+    <th>Followed that<br/>follows him</th>
+    <th>Followers that<br/>follows him</th>
+  </tr>
+  </thead>
+  <% @followers.each do |follower| %>
+    <tr>
+      <td><img src="<%= follower.image_url %>"/></td>
+      <td><%= "<a href=\"http://twitter.com/#{follower.screen_name}\">#{follower.screen_name}</a>" %></td>
+      <td><%= follower.name %></td>
+      <td><%= follower.nb_followers %></td>
+      <td><%= follower.nb_followed %></td>
+    </tr>
+  <% end %>
+</table>
+
+<h1>People followed by people you follow</h1>
+<table class="bordered">
+  <thead>
+  <tr>
+    <th></th>
+    <th>Id</th>
+    <th>User</th>
+    <th>Followed that<br/>follows him</th>
+    <th>Followers that<br/>follows him</th>
+  </tr>
+  </thead>
+  <% @followed_by_friends.each do |follower| %>
+    <tr>
+      <td><img src="<%= follower.image_url %>"/></td>
+      <td><%= "<a href=\"http://twitter.com/#{follower.screen_name}\">#{follower.screen_name}</a>" %></td>
+      <td><%= follower.name %></td>
+      <td><%= follower.nb_followers %></td>
+      <td><%= follower.nb_followed %></td>
+    </tr>
+  <% end %>
+</table>
+
+<h1>People followed by people following you</h1>
+<table class="bordered">
+  <thead>
+  <tr>
+    <th></th>
+    <th>Id</th>
+    <th>User</th>
+    <th>Followed that<br/>follows him</th>
+    <th>Followers that<br/>follows him</th>
+  </tr>
+  </thead>
+  <% @followed_by_followers.each do |follower| %>
+    <tr>
+      <td><img src="<%= follower.image_url %>"/></td>
+      <td><%= "<a href=\"http://twitter.com/#{follower.screen_name}\">#{follower.screen_name}</a>" %></td>
+      <td><%= follower.name %></td>
+      <td><%= follower.nb_followers %></td>
+      <td><%= follower.nb_followed %></td>
+    </tr>
+  <% end %>
+</table>
+
+
+</body>
+</html>

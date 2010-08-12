@@ -16,7 +16,7 @@ end
 
 BASENAME = File.basename ARGV[0]
 
-TARGET_DIRECTORY = "#{BASENAME}_cbr"
+TARGET_DIRECTORY = "#{BASENAME}_cbz"
 
 if File.exist? TARGET_DIRECTORY
   raise "Target directory [#{TARGET_DIRECTORY}] already exists"
@@ -31,13 +31,13 @@ def create_archive index
 end
 
 def create_curret_file_name current_file, current_file_index
-  "#{sprintf("%0#{NUMBER_OF_FILES_PER_ARCHIVE.to_s.length}d", current_file_index)}#{File.extname(current_file)}"
+  "#{sprintf("%0#{NUMBER_OF_FILES_PER_ARCHIVE.to_s.length}d", current_file_index)}#{File.extname(current_file).downcase}"
 end
 
 current_archive = create_archive current_archive_index
 
 def image? file_name, full_file_name = file_name
-  if ['.gif', '.jpg', '.png', '.jpeg'].include? File.extname(file_name)
+  if ['.gif', '.jpg', '.png', '.jpeg'].include? File.extname(file_name).downcase
     # p "Adding image file [#{full_file_name}]"
     true
   else
@@ -52,8 +52,9 @@ Dir.glob("#{ARGV[0]}/**/*.*").sort.each do |source_file|
   if ['.zip', '.cbz'].include? File.extname(source_file)
     files_to_add = []
 
+    p "Processing [#{source_file}]"
     Zip::ZipFile.foreach source_file do |current_file|
-      if image? current_file.name, "#{zip_source_file}@#{current_file.name}"
+      if image? current_file.name, "#{source_file}@#{current_file.name}"
         files_to_add << current_file.name
       end
     end
