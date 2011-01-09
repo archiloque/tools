@@ -1,0 +1,22 @@
+<html>
+<head>
+  <style type="text/css">
+  </style>
+</head>
+<body>
+<div>
+  Moyenne
+  <% all.each do |c| %>
+      <%= "<span style=\"background-color: ##{c}\">&nbsp;&nbsp;&nbsp;&nbsp</span>" %>
+  <% end %>
+</div>
+<% result.each do |t| %>
+    <div>
+      <%= t[:name] %>
+      <% t[:colors].each do |c| %>
+          <%= "<span style=\"background-color: ##{c}\">&nbsp;&nbsp;&nbsp;&nbsp</span>" %>
+      <% end %>
+    </div>
+<% end %>
+</body>
+</html>

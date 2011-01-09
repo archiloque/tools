@@ -13,3 +13,4 @@ All ruby code developped using [IntelliJ IDEA](http://www.jetbrains.com/idea/) w
 * flattener.rb: flatten a directory tree by adding the directory names to the files
 * parallel_downloader.rb: download a list of files from their url in parallel
 * podcast.rb: generate a podcast rss from a list of mp3 in a directory
+* couleur: scrappe lefigaro.fr then calcute the most present colors in images then aggregate them by tags, results are not significant but you can see them in result.html
