@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Ciné</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <style>
+
+* {
+  font-size: 12px;
+}
+
+table {
+ border-width:1px; 
+ border-style:solid; 
+ border-color:black;
+border-collapse:collapse;
+}
+
+td { 
+ border-width:1px;
+ border-style:solid; 
+ border-color:black;
+ padding: 2px;
+ } 
+ 
+ .press {
+   font-weight: bold;
+ }
+ 
+ .people {
+   color: red;
+ }
+  </style>
+</head>
+<body>
+<h1>Meilleurs notes par genre</h1>
+<table>
+<% genres.each do |row| %>
+	<tr>
+		<% row.each do |record| %>
+			<%= "<td>#{record}</td>" %>
+		<% end %>
+	</tr>
+<% end %>
+</table>
+
+<h1>Meilleurs notes par tag</h1>
+<table>
+<% tags.each do |row| %>
+	<tr>
+		<% row.each do |record| %>
+			<%= "<td>#{record}</td>" %>
+		<% end %>
+	</tr>
+<% end %>
+</table>
+
+<h1>Meilleurs notes par tag sans Cannes</h1>
+<table>
+<% tags2.each do |row| %>
+	<tr>
+		<% row.each do |record| %>
+			<%= "<td>#{record}</td>" %>
+		<% end %>
+	</tr>
+<% end %>
+</table>
+
+</body>
+</html>
