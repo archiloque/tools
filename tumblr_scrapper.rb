@@ -3,6 +3,7 @@ require 'open-uri'
 require 'nokogiri'
 require 'addressable/uri'
 require 'typhoeus'
+require 'fileutils'
 
 if ARGV.length != 1
   raise "Need the tumblr name"
@@ -28,8 +29,10 @@ def add_photo url, index, hydra
   request.on_complete do |response|
     if response.code == 302
       add_photo(response.headers_hash['Location'], index, hydra)
+    elsif response.code != 200
+      p "!!! #{response.code} #{index} #{url}"
     else
-      p "#{index} #{response.code} #{url}"
+      p "OK #{index} #{url}"
       File.open("#{DIR_NAME}/#{index}#{File.extname(URI.parse(url).path)}", 'w') { |f| f.write(response.body) }
     end
   end
@@ -58,17 +61,17 @@ while new_posts
     add_photo post.search('photo-url')[0].content, index, hydra
   end
   @@hydras_threads << Thread.new do
-    p "Starting thread #{Thread.current}"
+    p "Starting thread #{Thread.current}, #{@@hydras_threads.length} threads running"
     hydra.run
     @@hydras_threads.delete(Thread.current)
-    p "Ending thread #{Thread.current}"
+    p "Ending thread #{Thread.current}, #{@@hydras_threads.length} threads running"
   end
 end
 
 p "End listing, wait for scrapping end"
 
 until @@hydras_threads.empty?
-  p "Joining thread #{@@hydras_threads.first}"
+  p "Joining thread #{@@hydras_threads.first}, #{@@hydras_threads.length} threads running"
   @@hydras_threads.first.join
 end
 p "Done"
