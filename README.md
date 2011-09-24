@@ -2,9 +2,7 @@ Various tools.
 
 Ce contenu est placé sous license MIT. Content available under MIT license.
 
-Copyright (c) 2009-2010 Julien Kirch
-
-All ruby code developped using [IntelliJ IDEA](http://www.jetbrains.com/idea/) with an Open Source license.
+Copyright (c) 2009-2011 Julien Kirch
 
 ***
 
@@ -16,3 +14,4 @@ All ruby code developped using [IntelliJ IDEA](http://www.jetbrains.com/idea/) w
 
 * couleur: scrappe lefigaro.fr then calcute the most present colors in images then aggregate them by tags, results are not significant but you can see them in result.html
 * allocine: scrappe allocine.fr then process the marks given by the magazines and by the people and aggregate them by year and tags, results are not significants enough to do some analysis, you can see them in the result.zip
+* images_duplications: run images duplication detection on lefigaro.fr

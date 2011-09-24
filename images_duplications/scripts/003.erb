@@ -1,0 +1,21 @@
+<html>
+<head>
+  <style type="text/css">
+  </style>
+</head>
+<body>
+<table>
+  <% results.each do |r| %>
+      <tr>
+        <td>
+          <img src="<%= r[1] %>">
+        </td>
+        <td>
+          <%= r[0].size %><br>
+          <%= r[0].collect { |a| "<a href=\"#{a}\">#{a}</a>" }.join('<br>') %>
+        </td>
+      </tr>
+  <% end %>
+</table>
+</body>
+</html>
