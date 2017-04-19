@@ -19,14 +19,14 @@ final class MapState {
     private final @NotNull Level level;
 
     /**
-     * Grid empty squares before executing the state.
+     * False = position is empty before executing the state.
      */
     private final @NotNull BitSet previousGrid;
 
     /**
-     * Where will the next step be ? -1 = we are exiting
+     * Target of the current step step be ? -1 = we are exiting
      */
-    private final int targetCoordinates;
+    private final int currentStepTargetCoordinates;
 
     /**
      * The train elements before executing the state
@@ -64,7 +64,7 @@ final class MapState {
             @NotNull Level level,
             @NotNull BitSet previousGrid,
             int previousNumberOfMonsters,
-            int targetCoordinates,
+            int currentStepTargetCoordinates,
             @NotNull TrainElement[] previousTrainElements,
             @Nullable LinkedIntElement previousTrainPath,
             int monsterInsIndex,
@@ -78,7 +78,7 @@ final class MapState {
         this.previousGrid = previousGrid;
         this.previousTrainPath = previousTrainPath;
 
-        this.targetCoordinates = targetCoordinates;
+        this.currentStepTargetCoordinates = currentStepTargetCoordinates;
         this.previousTrainElements = previousTrainElements;
         this.newMissingNumberOfMonsters = previousNumberOfMonsters;
         this.monsterInsIndex = monsterInsIndex;
@@ -88,7 +88,7 @@ final class MapState {
         this.exitCoordinates = exitCoordinates;
     }
 
-    @Nullable boolean processState(@NotNull LinkedList<MapState> nextStates) {
+    boolean processState(@NotNull LinkedList<MapState> nextStates) {
         BitSet newGrid = (BitSet) previousGrid.clone();
 
         TrainElement[] trainElements = processTrainElements(newGrid);
@@ -131,8 +131,8 @@ final class MapState {
     }
 
     private @Nullable LinkedIntElement createTrainPath() {
-        if (targetCoordinates != -1) {
-            return new LinkedIntElement(targetCoordinates, previousTrainPath);
+        if (currentStepTargetCoordinates != -1) {
+            return new LinkedIntElement(currentStepTargetCoordinates, previousTrainPath);
         } else {
             return previousTrainPath;
         }
@@ -189,7 +189,7 @@ final class MapState {
         }
 
         int newTrainElementCoordinates =
-                calculateNewCoordinates(previousTrainElement, trainElementIndex, targetCoordinates);
+                calculateNewCoordinates(previousTrainElement, trainElementIndex, currentStepTargetCoordinates);
         int newTrainElementLocalCoordinates =
                 ((newTrainElementCoordinates >> 16) * level.width) + (newTrainElementCoordinates & 65535);
 
