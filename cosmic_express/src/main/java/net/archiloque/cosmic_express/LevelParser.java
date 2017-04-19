@@ -16,10 +16,10 @@ class LevelParser {
         elementsToChars.put(MapElement.EMPTY_INDEX, 'X');
         elementsToChars.put(MapElement.OBSTACLE_INDEX, 'O');
 
-        elementsToChars.put(MapElement.MONSTER_1_IN_EMPTY_INDEX, 'A');
-        elementsToChars.put(MapElement.MONSTER_1_OUT_FILLED_INDEX, 'a');
-        elementsToChars.put(MapElement.MONSTER_2_IN_EMPTY_INDEX, 'B');
-        elementsToChars.put(MapElement.MONSTER_2_OUT_FILLED_INDEX, 'b');
+        elementsToChars.put(MapElement.MONSTER_1_IN_FILLED_INDEX, 'A');
+        elementsToChars.put(MapElement.MONSTER_1_OUT_EMPTY_INDEX, 'a');
+        elementsToChars.put(MapElement.MONSTER_2_IN_FILLED_INDEX, 'B');
+        elementsToChars.put(MapElement.MONSTER_2_OUT_EMPTY_INDEX, 'b');
         elementsToChars.put(MapElement.RAIL_INDEX, 'R');
 
         charsToElements.put('I', MapElement.ENTRY_INDEX);

@@ -54,7 +54,7 @@ public class App {
 
         LinkedList<MapState> states = new LinkedList<>();
         states.add(mapState);
-        byte[] solution = null;
+        boolean[] solution = null;
         while ((solution == null) && (!states.isEmpty())) {
             MapState nextCandidate = states.pop();
             solution = nextCandidate.processState(states);
@@ -87,13 +87,17 @@ public class App {
         }
     }
 
-    private static @NotNull char[][] printableSolution(@NotNull MapState solution, @NotNull Level level, @NotNull byte[] grid) {
+    private static @NotNull char[][] printableSolution(@NotNull MapState solution, @NotNull Level level, @NotNull boolean[] grid) {
         char[][] result = new char[level.height][];
         for (int lineIndex = 0; lineIndex < level.height; lineIndex++) {
             char[] lineChar = new char[level.width];
             for (int columnIndex = 0; columnIndex < level.width; columnIndex++) {
-                byte element = grid[(lineIndex * level.width) + columnIndex];
-                lineChar[columnIndex] = LEVEL_PARSER.elementsToChars.get(element);
+                byte element = level.grid[(lineIndex * level.width) + columnIndex];
+                Character character = LEVEL_PARSER.elementsToChars.get(element);
+                if(character == null) {
+                    throw new RuntimeException("Unknown element [" + element + "]");
+                }
+                lineChar[columnIndex] = character;
             }
             result[lineIndex] = lineChar;
         }

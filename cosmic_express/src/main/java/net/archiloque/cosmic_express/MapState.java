@@ -18,9 +18,9 @@ final class MapState {
     private final @NotNull Level level;
 
     /**
-     * Grid status before executing the state.
+     * Grid empty squares before executing the state.
      */
-    private final @NotNull byte[] previousGrid;
+    private final @NotNull boolean[] previousGrid;
 
     /**
      * Where will the next step be ? -1 = we are exiting
@@ -61,7 +61,7 @@ final class MapState {
 
     MapState(
             @NotNull Level level,
-            @NotNull byte[] previousGrid,
+            @NotNull boolean[] previousGrid,
             int previousNumberOfMonsters,
             int targetCoordinates,
             @NotNull TrainElement[] previousTrainElements,
@@ -87,8 +87,8 @@ final class MapState {
         this.exitCoordinates = exitCoordinates;
     }
 
-    @Nullable byte[] processState(@NotNull LinkedList<MapState> nextStates) {
-        byte[] newGrid = cloneGrid();
+    @Nullable boolean[] processState(@NotNull LinkedList<MapState> nextStates) {
+        boolean[] newGrid = cloneGrid();
 
         TrainElement[] trainElements = processTrainElements(newGrid);
         if (trainElements == null) {
@@ -110,14 +110,14 @@ final class MapState {
         }
     }
 
-    private @NotNull  byte[] cloneGrid() {
-        byte[] grid = new byte[level.height * level.width];
+    private @NotNull  boolean[] cloneGrid() {
+        boolean[] grid = new boolean[level.height * level.width];
         System.arraycopy(previousGrid, 0, grid, 0, level.width * level.height);
         return grid;
     }
 
     private @NotNull MapState createMapState(
-            @NotNull byte[] grid,
+            @NotNull boolean[] grid,
             @NotNull TrainElement[] trainElements,
             @Nullable LinkedIntElement trainPath,
             int targetCoordinates) {
@@ -148,7 +148,7 @@ final class MapState {
      * @param newGrid the current grid.
      * @return the new train elements or null if the move is bad and we should cancel it.
      */
-    private @Nullable TrainElement[] processTrainElements(@NotNull byte[] newGrid) {
+    private @Nullable TrainElement[] processTrainElements(@NotNull boolean[] newGrid) {
         TrainElement[] trainElements = new TrainElement[level.trainSize];
         for (int trainElementIndex = 0; trainElementIndex < level.trainSize; trainElementIndex++) {
             TrainElement trainElement = processTrainElement(newGrid, trainElementIndex);
@@ -161,7 +161,7 @@ final class MapState {
         return trainElements;
     }
 
-    private @Nullable TrainElement processTrainElement(@NotNull byte[] newGrid, int trainElementIndex) {
+    private @Nullable TrainElement processTrainElement(@NotNull boolean[] newGrid, int trainElementIndex) {
         TrainElement previousTrainElement = previousTrainElements[trainElementIndex];
 
         // Already exited ?
@@ -198,7 +198,7 @@ final class MapState {
                 ((newTrainElementCoordinates >> 16) * level.width) + (newTrainElementCoordinates & 65535);
 
         if (trainElementIndex == 0) {
-            newGrid[newTrainElementLocalCoordinates] = MapElement.RAIL_INDEX;
+            newGrid[newTrainElementLocalCoordinates] = false;
         }
 
         byte newTrainElementContent = previousTrainElement.content;
@@ -215,9 +215,9 @@ final class MapState {
                 int[] monsterIns = monsterInsGrid[newTrainElementLocalCoordinates];
                 if ((monsterIns != null) && (monsterIns.length == 1)) {
                     int monsterInCoordinates = monsterIns[0];
-                    int element = newGrid[monsterInCoordinates];
+                    int element = level.grid[monsterInCoordinates];
                     newTrainElementContent = MapElement.MONSTER[element];
-                    newGrid[monsterInCoordinates] = MapElement.inBoardEmptyElement(newTrainElementContent);
+                    newGrid[monsterInCoordinates] = false;
                     monsterInsIndex -= 1 << Arrays.binarySearch(level.monsterIns, monsterInCoordinates);
                     monsterInsGrid = level.monsterInsGrids[monsterInsIndex];
                 }
@@ -230,15 +230,14 @@ final class MapState {
     }
 
     private boolean canEmpty(
-            @NotNull byte[] grid,
+            @NotNull boolean[] grid,
             @Nullable int[] monsterOuts,
             byte newTrainElementContent) {
         if (monsterOuts != null) {
             int outBoardEmptyElement = MapElement.outBoardEmptyElement(newTrainElementContent);
             for (int monsterOutCoordinates : monsterOuts) {
-                int monsterOutElement = grid[monsterOutCoordinates];
+                int monsterOutElement = level.grid[monsterOutCoordinates];
                 if (outBoardEmptyElement == monsterOutElement) {
-                    grid[monsterOutCoordinates] = MapElement.outBoardFilledElement(newTrainElementContent);
                     newMissingNumberOfMonsters--;
                     monsterOutsIndex -= 1 << Arrays.binarySearch(level.monsterOuts, monsterOutCoordinates);
                     monsterOutsGrid = level.monsterOutsGrids[monsterOutsIndex];
@@ -264,23 +263,23 @@ final class MapState {
     }
 
     private void addAvailableDirections(
-            @NotNull byte[] grid,
+            @NotNull boolean[] grid,
             @NotNull TrainElement[] trainElements,
             @Nullable LinkedIntElement trainPath,
             @NotNull LinkedList<MapState> nextStates) {
         TrainElement trainHead = trainElements[0];
         int currentLine = trainHead.coordinates >> 16;
         int currentColumn = trainHead.coordinates & 65535;
-        if ((currentLine > 0) && MapElement.CROSSABLE[grid[((currentLine - 1) * level.width) + currentColumn]]) {
+        if ((currentLine > 0) && grid[((currentLine - 1) * level.width) + currentColumn]) {
             nextStates.add(createMapState(grid, trainElements, trainPath, ((currentLine - 1) << 16) + currentColumn));
         }
-        if ((currentLine < (level.height - 1)) && MapElement.CROSSABLE[grid[((currentLine + 1) * level.width) + currentColumn]]) {
+        if ((currentLine < (level.height - 1)) && grid[((currentLine + 1) * level.width) + currentColumn]) {
             nextStates.add(createMapState(grid, trainElements, trainPath, ((currentLine + 1) << 16) + currentColumn));
         }
-        if ((currentColumn > 0) && MapElement.CROSSABLE[grid[(currentLine * level.width) + currentColumn - 1]]) {
+        if ((currentColumn > 0) && grid[(currentLine * level.width) + currentColumn - 1]) {
             nextStates.add(createMapState(grid, trainElements, trainPath, (currentLine << 16) + currentColumn - 1));
         }
-        if ((currentColumn < (level.width - 1)) && MapElement.CROSSABLE[grid[(currentLine * level.width) + currentColumn + 1]]) {
+        if ((currentColumn < (level.width - 1)) && grid[(currentLine * level.width) + currentColumn + 1]) {
             nextStates.add(createMapState(grid, trainElements, trainPath, (currentLine << 16) + currentColumn + 1));
         }
     }

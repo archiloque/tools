@@ -23,7 +23,7 @@ final class Level {
     /**
      * Contains MapElements.
      */
-    private final byte[] grid;
+    final byte[] grid;
 
     /**
      * Coordinates of the monsters ins.
@@ -108,18 +108,24 @@ final class Level {
                     TrainElementContent.NO_CONTENT,
                     -1
             );
+        }
 
+        boolean[] originalGrid = new boolean[height * width];
+        for(int i = 0; i < height * width; i++) {
+            if(MapElement.CROSSABLE[grid[i]]) {
+                originalGrid[i] = true;
+            }
         }
 
         List<MapState> result = new ArrayList<>(exitCoordinates.size());
         for (int exitIndex = 0; exitIndex < exitCoordinates.size(); exitIndex++) {
             Coordinates currentExit = exitCoordinates.get(exitIndex);
-            byte[] gridForExit = new byte[height * width];
-            System.arraycopy(grid, 0, gridForExit, 0, width * height);
+            boolean[] gridForExit = new boolean[height * width];
+            System.arraycopy(originalGrid, 0, gridForExit, 0, width * height);
             for (int otherExitIndex = 0; otherExitIndex < exitCoordinates.size(); otherExitIndex++) {
                 if (otherExitIndex != exitIndex) {
                     Coordinates exitCoordinate = exitCoordinates.get(otherExitIndex);
-                    gridForExit[(exitCoordinate.line * width) + exitCoordinate.column] = MapElement.OBSTACLE_INDEX;
+                    gridForExit[(exitCoordinate.line * width) + exitCoordinate.column] = false;
                 }
             }
             result.add(new MapState(this,
