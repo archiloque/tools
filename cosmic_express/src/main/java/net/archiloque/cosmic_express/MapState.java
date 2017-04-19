@@ -17,7 +17,7 @@ final class MapState {
     /**
      * Current Level.
      */
-    final @NotNull Level level;
+    private final @NotNull Level level;
 
     /**
      * Grid status before executing the state.
@@ -86,7 +86,7 @@ final class MapState {
         this.monsterInsGrid = monsterInsGrid;
         this.monsterOutsIndex = monsterOutsIndex;
         this.monsterOutsGrid = monsterOutsGrid;
-        this.exitCoordinates =exitCoordinates;
+        this.exitCoordinates = exitCoordinates;
     }
 
     @Nullable byte[] processState(LinkedList<MapState> nextStates) {
@@ -193,14 +193,14 @@ final class MapState {
         // No content for head
         if (trainElementIndex != 0) {
             if (newTrainElementContent != TrainElementContent.NO_CONTENT) {
-                if(canEmpty(grid, monsterOutsGrid[newTrainElementLocalCoordinates], newTrainElementContent)) {
+                if (canEmpty(grid, monsterOutsGrid[newTrainElementLocalCoordinates], newTrainElementContent)) {
                     newTrainElementContent = TrainElementContent.NO_CONTENT;
                 }
             }
 
             if (newTrainElementContent == TrainElementContent.NO_CONTENT) {
                 int[] monsterIns = monsterInsGrid[newTrainElementLocalCoordinates];
-                if((monsterIns != null) && (monsterIns.length == 1)) {
+                if ((monsterIns != null) && (monsterIns.length == 1)) {
                     int monsterInCoordinates = monsterIns[0];
                     int element = grid[monsterInCoordinates];
                     newTrainElementContent = MapElement.MONSTER[element];
@@ -217,7 +217,7 @@ final class MapState {
     }
 
     private boolean canEmpty(byte[] grid, int[] monsterOuts, byte newTrainElementContent) {
-        if(monsterOuts != null) {
+        if (monsterOuts != null) {
             int outBoardEmptyElement = MapElement.outBoardEmptyElement(newTrainElementContent);
             for (int monsterOutCoordinates : monsterOuts) {
                 int monsterOutElement = grid[monsterOutCoordinates];

@@ -27,7 +27,7 @@ class LevelFileParser {
     @NotNull Map<String, Level> parseFile(Path levelFiles) throws IOException {
         LevelParser levelParser = new LevelParser();
         Map<String, Level> result = new HashMap<>();
-        try(BufferedReader reader = Files.newBufferedReader(levelFiles)) {
+        try (BufferedReader reader = Files.newBufferedReader(levelFiles)) {
             ReadingStatus currentStatus = ReadingStatus.HEADER;
             String currentLine = reader.readLine();
             String currentLevelName = null;
@@ -88,7 +88,7 @@ class LevelFileParser {
                     }
                 }
             }
-            if(! currentContent.isEmpty()) {
+            if (!currentContent.isEmpty()) {
                 result.put(
                         currentLevelName,
                         levelParser.readLevel(currentContent.toArray(new String[currentContent.size()]), currentTrainSize)

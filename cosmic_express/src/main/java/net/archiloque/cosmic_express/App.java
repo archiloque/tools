@@ -33,17 +33,20 @@ public class App {
                 Level level = stringLevelMap.get(levelName);
                 List<MapState> mapStates = level.createMapStates();
                 if (mapStates.size() == 1) {
-                    solveProblem(levelName, mapStates.get(0), resultWriter);
+                    solveProblem(levelName, level, mapStates.get(0), resultWriter);
                 } else {
                     for (int problemIndex = 0; problemIndex < mapStates.size(); problemIndex++) {
-                        solveProblem(levelName + " " + problemIndex, mapStates.get(problemIndex), resultWriter);
+                        solveProblem(levelName + " " + problemIndex, level, mapStates.get(problemIndex), resultWriter);
                     }
                 }
             }
         }
     }
 
-    private static void solveProblem(@NotNull String levelName, @NotNull MapState mapState, @NotNull BufferedWriter resultWriter) throws IOException {
+    private static void solveProblem(@NotNull String levelName,
+                                     @NotNull Level level,
+                                     @NotNull MapState mapState,
+                                     @NotNull BufferedWriter resultWriter) throws IOException {
         System.out.println("Calculating problem [" + levelName + "]");
         resultWriter.write(levelName);
         resultWriter.newLine();
@@ -58,7 +61,7 @@ public class App {
             if (solution != null) {
                 long stopTime = System.currentTimeMillis();
                 System.out.println("Solved in " + (((float) (stopTime - startTime)) / 1000));
-                char[][] solutionAsChar = printableSolution(nextCandidate, solution);
+                char[][] solutionAsChar = printableSolution(nextCandidate, level, solution);
                 for (char[] chars : solutionAsChar) {
                     resultWriter.write(chars);
                     resultWriter.newLine();
@@ -84,18 +87,18 @@ public class App {
         }
     }
 
-    private static @NotNull char[][] printableSolution(@NotNull MapState solution, @NotNull byte[] grid) {
-        char[][] result = new char[solution.level.height][];
-        for (int lineIndex = 0; lineIndex < solution.level.height; lineIndex++) {
-            char[] lineChar = new char[solution.level.width];
-            for (int columnIndex = 0; columnIndex < solution.level.width; columnIndex++) {
-                byte element = grid[(lineIndex * solution.level.width) + columnIndex];
+    private static @NotNull char[][] printableSolution(@NotNull MapState solution, @NotNull Level level, @NotNull byte[] grid) {
+        char[][] result = new char[level.height][];
+        for (int lineIndex = 0; lineIndex < level.height; lineIndex++) {
+            char[] lineChar = new char[level.width];
+            for (int columnIndex = 0; columnIndex < level.width; columnIndex++) {
+                byte element = grid[(lineIndex * level.width) + columnIndex];
                 lineChar[columnIndex] = LEVEL_PARSER.elementsToChars.get(element);
             }
             result[lineIndex] = lineChar;
         }
-        Coordinates currentPoint = new Coordinates(solution.level.entry >> 16, solution.level.entry & 65535);
-        result[solution.level.entry >> 16][solution.level.entry & 65535] = LEVEL_PARSER.elementsToChars.get(MapElement.ENTRY_INDEX);
+        Coordinates currentPoint = new Coordinates(level.entry >> 16, level.entry & 65535);
+        result[level.entry >> 16][level.entry & 65535] = LEVEL_PARSER.elementsToChars.get(MapElement.ENTRY_INDEX);
 
         int[] trainPath = getTrainPath(solution);
         for (int i = 0; i < trainPath.length - 1; i++) {
@@ -126,7 +129,7 @@ public class App {
         List<Integer> trainPathList = new ArrayList<>();
 
         LinkedIntElement trainPath = solution.previousTrainPath;
-        while(trainPath != null) {
+        while (trainPath != null) {
             trainPathList.add(trainPath.element);
             trainPath = trainPath.previous;
         }

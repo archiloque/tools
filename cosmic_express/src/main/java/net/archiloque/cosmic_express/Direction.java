@@ -2,7 +2,7 @@ package net.archiloque.cosmic_express;
 
 final class Direction {
 
-    private Direction(){
+    private Direction() {
     }
 
     final static byte UP = 0;
@@ -11,13 +11,13 @@ final class Direction {
     final static byte RIGHT = 3;
 
     static char toChar(int direction) {
-        if(direction == UP) {
+        if (direction == UP) {
             return '↑';
-        } else if(direction == DOWN) {
+        } else if (direction == DOWN) {
             return '↓';
-        } else if(direction == LEFT) {
+        } else if (direction == LEFT) {
             return '←';
-        } else if(direction == RIGHT) {
+        } else if (direction == RIGHT) {
             return '→';
         } else {
             throw new RuntimeException("Unknwown direction " + direction);

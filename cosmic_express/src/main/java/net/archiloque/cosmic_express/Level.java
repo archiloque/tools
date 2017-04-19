@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Represents the structure of a level.
  */
-class Level {
+final class Level {
 
     /**
      * Train size, including the head.

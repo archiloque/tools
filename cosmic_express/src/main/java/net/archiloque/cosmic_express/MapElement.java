@@ -1,10 +1,7 @@
 package net.archiloque.cosmic_express;
 
 final class MapElement {
-
-    private MapElement() {
-    }
-
+    
     private final static int NUMBER_OF_ELEMENTS = 13;
 
     final static byte EMPTY_INDEX = 0;

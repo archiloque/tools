@@ -2,7 +2,7 @@ package net.archiloque.cosmic_express;
 
 final class TrainElementStatus {
 
-    private TrainElementStatus(){
+    private TrainElementStatus() {
     }
 
     final static byte RUNNING = 0;

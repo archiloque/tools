@@ -2,7 +2,7 @@ package net.archiloque.cosmic_express;
 
 final class TrainElementContent {
 
-    private TrainElementContent(){
+    private TrainElementContent() {
     }
 
     final static byte NO_CONTENT = 0;
