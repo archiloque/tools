@@ -2,7 +2,6 @@ package net.archiloque.cosmic_express;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class LevelTest
                 "XXXXXXXX\n" +
                 "XXXXXXXX").split("\n"), 2);
         LinkedList<MapState> states = new LinkedList<>();
-        List<MapState> mapStates = level.createMapState();
+        List<MapState> mapStates = level.createMapStates();
         assertEquals(mapStates.size(), 1);
         states.add(mapStates.get(0));
         byte grid[] = null;

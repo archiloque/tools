@@ -1,15 +1,19 @@
 package net.archiloque.cosmic_express;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Represents the structure of a level.
  */
 class Level {
 
+    /**
+     * Train size, including the head.
+     */
     final int trainSize;
 
     final int height;
@@ -19,14 +23,26 @@ class Level {
     /**
      * Contains MapElements.
      */
-    final byte[] grid;
+    private final byte[] grid;
 
+    /**
+     * Coordinates of the monsters ins.
+     */
     int[] monsterIns;
 
+    /**
+     * Coordinates of the monsters outs.
+     */
     int[] monsterOuts;
 
+    /**
+     * Coordinates of the monsters ins near each position indexed by which monsters ins are not empty.
+     */
     int[][][] monsterInsGrids;
 
+    /**
+     * Coordinates of the monsters outs near each position indexed by which monsters outs are not empty.
+     */
     int[][][] monsterOutsGrids;
 
     int entry;
@@ -47,7 +63,10 @@ class Level {
         }
     }
 
-    List<MapState> createMapState() {
+    /**
+     * Create MapState for each possible exit.
+     */
+    @NotNull List<MapState> createMapStates() {
         int numberOfMonsters = 0;
         List<Coordinates> exitCoordinates = new ArrayList<>();
 
@@ -68,14 +87,14 @@ class Level {
             }
         }
 
-        monsterIns = toPrimitiveInt(monstersInsList);
+        monsterIns = listToPrimitiveIntArray(monstersInsList);
         int monstersInsPossibilities = 1 << monsterIns.length;
         monsterInsGrids = new int[monstersInsPossibilities][][];
         for (int i = 0; i < monstersInsPossibilities; i++) {
             monsterInsGrids[i] = calculateMonsterGrid(i, monsterIns);
         }
 
-        monsterOuts = toPrimitiveInt(monstersOutsList);
+        monsterOuts = listToPrimitiveIntArray(monstersOutsList);
         int monstersOutsPossibilities = 1 << monsterOuts.length;
         monsterOutsGrids = new int[monstersOutsPossibilities][][];
         for (int i = 0; i < monstersOutsPossibilities; i++) {
@@ -108,7 +127,7 @@ class Level {
                             numberOfMonsters,
                             -1,
                             trainElements,
-                            new int[0],
+                            null,
                             monstersInsPossibilities - 1,
                             monsterInsGrids[monstersInsPossibilities - 1],
                             monstersOutsPossibilities - 1,
@@ -121,7 +140,10 @@ class Level {
         return result;
     }
 
-    private int[] toPrimitiveInt(List<Integer> list) {
+    /**
+     * Convert a list to a primitive int array.
+     */
+    static @NotNull int[] listToPrimitiveIntArray(@NotNull List<Integer> list) {
         int[] result = new int[list.size()];
         for (int i = 0; i < result.length; i++) {
             result[i] = list.get(i);
@@ -129,7 +151,7 @@ class Level {
         return result;
     }
 
-    private void addPosition(List<Integer>[] resultWithLists, int line, int column, int currentPosition) {
+    private void addInOrOutPosition(List<Integer>[] resultWithLists, int line, int column, int currentPosition) {
         int targetPosition = (line * width) + column;
         List<Integer> currentList = resultWithLists[targetPosition];
         if (currentList == null) {
@@ -137,10 +159,12 @@ class Level {
             resultWithLists[targetPosition] = currentList;
         }
         currentList.add(currentPosition);
-
     }
 
-    private int[][] calculateMonsterGrid(int index, int[] positions) {
+    /**
+     * Calculate grid monsters.
+     */
+    private @NotNull int[][] calculateMonsterGrid(int index, @NotNull int[] positions) {
         List<Integer>[] resultWithLists = new List[width * height];
         for (int i = 0; i < positions.length; i++) {
             if ((index & (1 << i)) != 0) {
@@ -149,19 +173,19 @@ class Level {
                 int column = currentPosition % width;
                 // above
                 if (line > 0) {
-                    addPosition(resultWithLists, line - 1, column, currentPosition);
+                    addInOrOutPosition(resultWithLists, line - 1, column, currentPosition);
                 }
                 // under
                 if (line < (height - 1)) {
-                    addPosition(resultWithLists, line + 1, column, currentPosition);
+                    addInOrOutPosition(resultWithLists, line + 1, column, currentPosition);
                 }
                 // left
                 if (column > 0) {
-                    addPosition(resultWithLists, line, column - 1, currentPosition);
+                    addInOrOutPosition(resultWithLists, line, column - 1, currentPosition);
                 }
                 // right
                 if (column < (width - 1)) {
-                    addPosition(resultWithLists, line, column + 1, currentPosition);
+                    addInOrOutPosition(resultWithLists, line, column + 1, currentPosition);
                 }
 
             }
@@ -170,7 +194,7 @@ class Level {
         for (int i = 0; i < realResult.length; i++) {
             List<Integer> currentGrid = resultWithLists[i];
             if (currentGrid != null) {
-                int[] currentGridPrimitive = toPrimitiveInt(currentGrid);
+                int[] currentGridPrimitive = listToPrimitiveIntArray(currentGrid);
                 Arrays.sort(currentGridPrimitive);
                 realResult[i] = currentGridPrimitive;
             }

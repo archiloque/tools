@@ -9,26 +9,56 @@ import java.util.LinkedList;
 
 final class MapState {
 
-    final @NotNull int[] previousTrainPath;
+    /**
+     * Path of the train leading to the current state.
+     */
+    final @Nullable LinkedIntElement previousTrainPath;
 
+    /**
+     * Current Level.
+     */
     final @NotNull Level level;
 
+    /**
+     * Grid status before executing the state.
+     */
     private final @NotNull byte[] previousGrid;
 
+    /**
+     * Where will the next step be ? -1 = we are exiting
+     */
     private final int targetCoordinates;
 
+    /**
+     * The train elements before executing the state
+     */
     private final @NotNull TrainElement[] previousTrainElements;
 
     private int newMissingNumberOfMonsters;
 
+    /**
+     * Index of the map indicating where are the monsters ins.
+     */
     private int monsterInsIndex;
 
+    /**
+     * Index of the map indicating where are the monsters outs.
+     */
     private int monsterOutsIndex;
 
+    /**
+     * Map showing where are the monsters ins.
+     */
     private int[][] monsterInsGrid;
 
+    /**
+     * Map showing where are the monsters outs.
+     */
     private int[][] monsterOutsGrid;
 
+    /**
+     * Coordinates of the exit.
+     */
     int exitCoordinates;
 
     MapState(
@@ -37,7 +67,7 @@ final class MapState {
             int previousNumberOfMonsters,
             int targetCoordinates,
             @NotNull TrainElement[] previousTrainElements,
-            @NotNull int[] previousTrainPath,
+            @Nullable LinkedIntElement previousTrainPath,
             int monsterInsIndex,
             int[][] monsterInsGrid,
             int monsterOutsIndex,
@@ -74,7 +104,7 @@ final class MapState {
             nextStates.addFirst(createMapState(grid, trainElements, previousTrainPath, -1));
             return null;
         } else {
-            @NotNull int[] trainPath = createTrainPath();
+            @NotNull LinkedIntElement trainPath = createTrainPath();
             addAvailableDirections(grid, trainElements, trainPath, nextStates);
             return null;
         }
@@ -86,7 +116,7 @@ final class MapState {
         return grid;
     }
 
-    private @NotNull MapState createMapState(@NotNull byte[] grid, @NotNull TrainElement[] trainElements, int[] trainPath, int targetCoordinates) {
+    private @NotNull MapState createMapState(@NotNull byte[] grid, @NotNull TrainElement[] trainElements, LinkedIntElement trainPath, int targetCoordinates) {
         return new MapState(
                 level,
                 grid,
@@ -101,12 +131,9 @@ final class MapState {
                 exitCoordinates);
     }
 
-    private @NotNull int[] createTrainPath() {
+    private @Nullable LinkedIntElement createTrainPath() {
         if (targetCoordinates != -1) {
-            int[] trainPath = new int[previousTrainPath.length + 1];
-            System.arraycopy(previousTrainPath, 0, trainPath, 0, previousTrainPath.length);
-            trainPath[previousTrainPath.length] = targetCoordinates;
-            return trainPath;
+            return new LinkedIntElement(targetCoordinates, previousTrainPath);
         } else {
             return previousTrainPath;
         }
@@ -220,7 +247,7 @@ final class MapState {
     }
 
     private void addAvailableDirections(
-            @NotNull byte[] grid, @NotNull TrainElement[] trainElements, @NotNull int[] trainPath, @NotNull LinkedList<MapState> nextStates) {
+            @NotNull byte[] grid, @NotNull TrainElement[] trainElements, @Nullable LinkedIntElement trainPath, @NotNull LinkedList<MapState> nextStates) {
         TrainElement trainHead = trainElements[0];
         int currentLine = trainHead.coordinates >> 16;
         int currentColumn = trainHead.coordinates & 65535;

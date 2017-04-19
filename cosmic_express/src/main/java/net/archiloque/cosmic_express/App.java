@@ -7,10 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class App {
 
@@ -34,7 +31,7 @@ public class App {
         try (BufferedWriter resultWriter = Files.newBufferedWriter(Paths.get(fileName.substring(0, fileName.length() - 4) + "-solutions.txt"))) {
             for (String levelName : levelNames) {
                 Level level = stringLevelMap.get(levelName);
-                List<MapState> mapStates = level.createMapState();
+                List<MapState> mapStates = level.createMapStates();
                 if (mapStates.size() == 1) {
                     solveProblem(levelName, mapStates.get(0), resultWriter);
                 } else {
@@ -99,11 +96,13 @@ public class App {
         }
         Coordinates currentPoint = new Coordinates(solution.level.entry >> 16, solution.level.entry & 65535);
         result[solution.level.entry >> 16][solution.level.entry & 65535] = LEVEL_PARSER.elementsToChars.get(MapElement.ENTRY_INDEX);
-        for (int i = 0; i < solution.previousTrainPath.length - 1; i++) {
-            int from = solution.previousTrainPath[i];
+
+        int[] trainPath = getTrainPath(solution);
+        for (int i = 0; i < trainPath.length - 1; i++) {
+            int from = trainPath[i];
             int fromLine = from >> 16;
             int fromColumn = from & 65535;
-            int to = solution.previousTrainPath[i + 1];
+            int to = trainPath[i + 1];
             int toLine = to >> 16;
             int toColumn = to & 65535;
             int direction;
@@ -121,5 +120,17 @@ public class App {
         }
         result[solution.exitCoordinates >> 16][solution.exitCoordinates & 65535] = LEVEL_PARSER.elementsToChars.get(MapElement.EXIT_INDEX);
         return result;
+    }
+
+    private static int[] getTrainPath(@NotNull MapState solution) {
+        List<Integer> trainPathList = new ArrayList<>();
+
+        LinkedIntElement trainPath = solution.previousTrainPath;
+        while(trainPath != null) {
+            trainPathList.add(trainPath.element);
+            trainPath = trainPath.previous;
+        }
+        Collections.reverse(trainPathList);
+        return Level.listToPrimitiveIntArray(trainPathList);
     }
 }
