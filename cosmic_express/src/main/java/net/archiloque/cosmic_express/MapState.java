@@ -3,7 +3,6 @@ package net.archiloque.cosmic_express;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -90,27 +89,27 @@ final class MapState {
     }
 
     @Nullable byte[] processState(@NotNull LinkedList<MapState> nextStates) {
-        byte[] grid = cloneGrid();
+        byte[] newGrid = cloneGrid();
 
-        TrainElement[] trainElements = processTrainElements(grid);
+        TrainElement[] trainElements = processTrainElements(newGrid);
         if (trainElements == null) {
             return null;
         }
 
         // all exited ?
         if (trainElements[level.trainSize - 1].trainElementStatus == TrainElementStatus.EXITED) {
-            return (newMissingNumberOfMonsters == 0) ? grid : null;
+            return (newMissingNumberOfMonsters == 0) ? newGrid : null;
         } else if (trainElements[0].trainElementStatus == TrainElementStatus.EXITED) {
-            nextStates.addFirst(createMapState(grid, trainElements, previousTrainPath, -1));
+            nextStates.addFirst(createMapState(newGrid, trainElements, previousTrainPath, -1));
             return null;
         } else {
             @Nullable LinkedIntElement trainPath = createTrainPath();
-            addAvailableDirections(grid, trainElements, trainPath, nextStates);
+            addAvailableDirections(newGrid, trainElements, trainPath, nextStates);
             return null;
         }
     }
 
-    private byte[] cloneGrid() {
+    private @NotNull  byte[] cloneGrid() {
         byte[] grid = new byte[level.height * level.width];
         System.arraycopy(previousGrid, 0, grid, 0, level.width * level.height);
         return grid;
@@ -143,10 +142,16 @@ final class MapState {
         }
     }
 
-    private @Nullable TrainElement[] processTrainElements(@NotNull byte[] grid) {
+
+    /**
+     * Process the train elements
+     * @param newGrid the current grid.
+     * @return null the new train elements or null if the move is bad and we should cancel it.
+     */
+    private @Nullable TrainElement[] processTrainElements(@NotNull byte[] newGrid) {
         TrainElement[] trainElements = new TrainElement[level.trainSize];
         for (int trainElementIndex = 0; trainElementIndex < level.trainSize; trainElementIndex++) {
-            TrainElement trainElement = processTrainElement(grid, trainElementIndex);
+            TrainElement trainElement = processTrainElement(newGrid, trainElementIndex);
             if (trainElement != null) {
                 trainElements[trainElementIndex] = trainElement;
             } else {
@@ -156,7 +161,7 @@ final class MapState {
         return trainElements;
     }
 
-    private @Nullable TrainElement processTrainElement(@NotNull byte[] grid, int trainElementIndex) {
+    private @Nullable TrainElement processTrainElement(@NotNull byte[] newGrid, int trainElementIndex) {
         TrainElement previousTrainElement = previousTrainElements[trainElementIndex];
 
         // Already exited ?
@@ -187,11 +192,13 @@ final class MapState {
             }
         }
 
-        int newTrainElementCoordinates = calculateNewCoordinates(previousTrainElement, trainElementIndex, targetCoordinates);
-        int newTrainElementLocalCoordinates = ((newTrainElementCoordinates >> 16) * level.width) + (newTrainElementCoordinates & 65535);
+        int newTrainElementCoordinates =
+                calculateNewCoordinates(previousTrainElement, trainElementIndex, targetCoordinates);
+        int newTrainElementLocalCoordinates =
+                ((newTrainElementCoordinates >> 16) * level.width) + (newTrainElementCoordinates & 65535);
 
         if (trainElementIndex == 0) {
-            grid[newTrainElementLocalCoordinates] = MapElement.RAIL_INDEX;
+            newGrid[newTrainElementLocalCoordinates] = MapElement.RAIL_INDEX;
         }
 
         byte newTrainElementContent = previousTrainElement.content;
@@ -199,7 +206,7 @@ final class MapState {
         // No content for head
         if (trainElementIndex != 0) {
             if (newTrainElementContent != TrainElementContent.NO_CONTENT) {
-                if (canEmpty(grid, monsterOutsGrid[newTrainElementLocalCoordinates], newTrainElementContent)) {
+                if (canEmpty(newGrid, monsterOutsGrid[newTrainElementLocalCoordinates], newTrainElementContent)) {
                     newTrainElementContent = TrainElementContent.NO_CONTENT;
                 }
             }
@@ -208,9 +215,9 @@ final class MapState {
                 int[] monsterIns = monsterInsGrid[newTrainElementLocalCoordinates];
                 if ((monsterIns != null) && (monsterIns.length == 1)) {
                     int monsterInCoordinates = monsterIns[0];
-                    int element = grid[monsterInCoordinates];
+                    int element = newGrid[monsterInCoordinates];
                     newTrainElementContent = MapElement.MONSTER[element];
-                    grid[monsterInCoordinates] = MapElement.inBoardEmptyElement(newTrainElementContent);
+                    newGrid[monsterInCoordinates] = MapElement.inBoardEmptyElement(newTrainElementContent);
                     monsterInsIndex -= 1 << Arrays.binarySearch(level.monsterIns, monsterInCoordinates);
                     monsterInsGrid = level.monsterInsGrids[monsterInsIndex];
                 }
