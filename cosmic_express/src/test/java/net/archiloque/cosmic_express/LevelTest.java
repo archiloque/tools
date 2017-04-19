@@ -2,10 +2,8 @@ package net.archiloque.cosmic_express;
 
 import org.junit.Test;
 
-import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class LevelTest

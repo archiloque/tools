@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 final class MapState {
 
@@ -100,9 +99,11 @@ final class MapState {
         if (trainElements[level.trainSize - 1].trainElementStatus == TrainElementStatus.EXITED) {
             return (newMissingNumberOfMonsters == 0) ? newGrid : null;
         } else if (trainElements[0].trainElementStatus == TrainElementStatus.EXITED) {
-            nextStates.addFirst(createMapState(newGrid, trainElements, previousTrainPath, -1));
+            // we are exiting : we go to the exit
+            nextStates.add(createMapState(newGrid, trainElements, previousTrainPath, -1));
             return null;
         } else {
+            // running normally
             @Nullable LinkedIntElement trainPath = createTrainPath();
             addAvailableDirections(newGrid, trainElements, trainPath, nextStates);
             return null;
@@ -142,11 +143,10 @@ final class MapState {
         }
     }
 
-
     /**
      * Process the train elements
      * @param newGrid the current grid.
-     * @return null the new train elements or null if the move is bad and we should cancel it.
+     * @return the new train elements or null if the move is bad and we should cancel it.
      */
     private @Nullable TrainElement[] processTrainElements(@NotNull byte[] newGrid) {
         TrainElement[] trainElements = new TrainElement[level.trainSize];
@@ -249,7 +249,6 @@ final class MapState {
         return false;
     }
 
-
     private int calculateNewCoordinates(
             @NotNull TrainElement trainElement,
             int trainElementIndex,
@@ -273,16 +272,16 @@ final class MapState {
         int currentLine = trainHead.coordinates >> 16;
         int currentColumn = trainHead.coordinates & 65535;
         if ((currentLine > 0) && MapElement.CROSSABLE[grid[((currentLine - 1) * level.width) + currentColumn]]) {
-            nextStates.addFirst(createMapState(grid, trainElements, trainPath, ((currentLine - 1) << 16) + currentColumn));
+            nextStates.add(createMapState(grid, trainElements, trainPath, ((currentLine - 1) << 16) + currentColumn));
         }
         if ((currentLine < (level.height - 1)) && MapElement.CROSSABLE[grid[((currentLine + 1) * level.width) + currentColumn]]) {
-            nextStates.addFirst(createMapState(grid, trainElements, trainPath, ((currentLine + 1) << 16) + currentColumn));
+            nextStates.add(createMapState(grid, trainElements, trainPath, ((currentLine + 1) << 16) + currentColumn));
         }
         if ((currentColumn > 0) && MapElement.CROSSABLE[grid[(currentLine * level.width) + currentColumn - 1]]) {
-            nextStates.addFirst(createMapState(grid, trainElements, trainPath, (currentLine << 16) + currentColumn - 1));
+            nextStates.add(createMapState(grid, trainElements, trainPath, (currentLine << 16) + currentColumn - 1));
         }
         if ((currentColumn < (level.width - 1)) && MapElement.CROSSABLE[grid[(currentLine * level.width) + currentColumn + 1]]) {
-            nextStates.addFirst(createMapState(grid, trainElements, trainPath, (currentLine << 16) + currentColumn + 1));
+            nextStates.add(createMapState(grid, trainElements, trainPath, (currentLine << 16) + currentColumn + 1));
         }
     }
 
