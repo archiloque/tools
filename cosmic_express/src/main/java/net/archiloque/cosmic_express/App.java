@@ -54,14 +54,14 @@ public class App {
 
         LinkedList<MapState> states = new LinkedList<>();
         states.add(mapState);
-        boolean[] solution = null;
-        while ((solution == null) && (!states.isEmpty())) {
+        boolean solution = false;
+        while ((!solution) && (!states.isEmpty())) {
             MapState nextCandidate = states.pop();
             solution = nextCandidate.processState(states);
-            if (solution != null) {
+            if (solution) {
                 long stopTime = System.currentTimeMillis();
                 System.out.println("Solved in " + (((float) (stopTime - startTime)) / 1000));
-                char[][] solutionAsChar = printableSolution(nextCandidate, level, solution);
+                char[][] solutionAsChar = printableSolution(nextCandidate, level);
                 for (char[] chars : solutionAsChar) {
                     resultWriter.write(chars);
                     resultWriter.newLine();
@@ -87,14 +87,14 @@ public class App {
         }
     }
 
-    private static @NotNull char[][] printableSolution(@NotNull MapState solution, @NotNull Level level, @NotNull boolean[] grid) {
+    private static @NotNull char[][] printableSolution(@NotNull MapState solution, @NotNull Level level) {
         char[][] result = new char[level.height][];
         for (int lineIndex = 0; lineIndex < level.height; lineIndex++) {
             char[] lineChar = new char[level.width];
             for (int columnIndex = 0; columnIndex < level.width; columnIndex++) {
                 byte element = level.grid[(lineIndex * level.width) + columnIndex];
                 Character character = LEVEL_PARSER.elementsToChars.get(element);
-                if(character == null) {
+                if (character == null) {
                     throw new RuntimeException("Unknown element [" + element + "]");
                 }
                 lineChar[columnIndex] = character;

@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 
 /**
@@ -110,22 +111,21 @@ final class Level {
             );
         }
 
-        boolean[] originalGrid = new boolean[height * width];
+        BitSet originalGrid = new BitSet(height * width);
         for(int i = 0; i < height * width; i++) {
-            if(MapElement.CROSSABLE[grid[i]]) {
-                originalGrid[i] = true;
+            if(! MapElement.CROSSABLE[grid[i]]) {
+                originalGrid.set(i);
             }
         }
 
         List<MapState> result = new ArrayList<>(exitCoordinates.size());
         for (int exitIndex = 0; exitIndex < exitCoordinates.size(); exitIndex++) {
             Coordinates currentExit = exitCoordinates.get(exitIndex);
-            boolean[] gridForExit = new boolean[height * width];
-            System.arraycopy(originalGrid, 0, gridForExit, 0, width * height);
+            BitSet gridForExit = (BitSet) originalGrid.clone();
             for (int otherExitIndex = 0; otherExitIndex < exitCoordinates.size(); otherExitIndex++) {
                 if (otherExitIndex != exitIndex) {
                     Coordinates exitCoordinate = exitCoordinates.get(otherExitIndex);
-                    gridForExit[(exitCoordinate.line * width) + exitCoordinate.column] = false;
+                    gridForExit.set((exitCoordinate.line * width) + exitCoordinate.column);
                 }
             }
             result.add(new MapState(this,

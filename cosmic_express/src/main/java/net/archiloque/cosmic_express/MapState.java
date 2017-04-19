@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.BitSet;
 
 final class MapState {
 
@@ -20,7 +21,7 @@ final class MapState {
     /**
      * Grid empty squares before executing the state.
      */
-    private final @NotNull boolean[] previousGrid;
+    private final @NotNull BitSet previousGrid;
 
     /**
      * Where will the next step be ? -1 = we are exiting
@@ -61,7 +62,7 @@ final class MapState {
 
     MapState(
             @NotNull Level level,
-            @NotNull boolean[] previousGrid,
+            @NotNull BitSet previousGrid,
             int previousNumberOfMonsters,
             int targetCoordinates,
             @NotNull TrainElement[] previousTrainElements,
@@ -87,37 +88,31 @@ final class MapState {
         this.exitCoordinates = exitCoordinates;
     }
 
-    @Nullable boolean[] processState(@NotNull LinkedList<MapState> nextStates) {
-        boolean[] newGrid = cloneGrid();
+    @Nullable boolean processState(@NotNull LinkedList<MapState> nextStates) {
+        BitSet newGrid = (BitSet) previousGrid.clone();
 
         TrainElement[] trainElements = processTrainElements(newGrid);
         if (trainElements == null) {
-            return null;
+            return false;
         }
 
         // all exited ?
         if (trainElements[level.trainSize - 1].trainElementStatus == TrainElementStatus.EXITED) {
-            return (newMissingNumberOfMonsters == 0) ? newGrid : null;
+            return (newMissingNumberOfMonsters == 0);
         } else if (trainElements[0].trainElementStatus == TrainElementStatus.EXITED) {
             // we are exiting : we go to the exit
             nextStates.add(createMapState(newGrid, trainElements, previousTrainPath, -1));
-            return null;
+            return false;
         } else {
             // running normally
             @Nullable LinkedIntElement trainPath = createTrainPath();
             addAvailableDirections(newGrid, trainElements, trainPath, nextStates);
-            return null;
+            return false;
         }
     }
 
-    private @NotNull  boolean[] cloneGrid() {
-        boolean[] grid = new boolean[level.height * level.width];
-        System.arraycopy(previousGrid, 0, grid, 0, level.width * level.height);
-        return grid;
-    }
-
     private @NotNull MapState createMapState(
-            @NotNull boolean[] grid,
+            @NotNull BitSet grid,
             @NotNull TrainElement[] trainElements,
             @Nullable LinkedIntElement trainPath,
             int targetCoordinates) {
@@ -145,10 +140,11 @@ final class MapState {
 
     /**
      * Process the train elements
+     *
      * @param newGrid the current grid.
      * @return the new train elements or null if the move is bad and we should cancel it.
      */
-    private @Nullable TrainElement[] processTrainElements(@NotNull boolean[] newGrid) {
+    private @Nullable TrainElement[] processTrainElements(@NotNull BitSet newGrid) {
         TrainElement[] trainElements = new TrainElement[level.trainSize];
         for (int trainElementIndex = 0; trainElementIndex < level.trainSize; trainElementIndex++) {
             TrainElement trainElement = processTrainElement(newGrid, trainElementIndex);
@@ -161,7 +157,7 @@ final class MapState {
         return trainElements;
     }
 
-    private @Nullable TrainElement processTrainElement(@NotNull boolean[] newGrid, int trainElementIndex) {
+    private @Nullable TrainElement processTrainElement(@NotNull BitSet newGrid, int trainElementIndex) {
         TrainElement previousTrainElement = previousTrainElements[trainElementIndex];
 
         // Already exited ?
@@ -198,7 +194,7 @@ final class MapState {
                 ((newTrainElementCoordinates >> 16) * level.width) + (newTrainElementCoordinates & 65535);
 
         if (trainElementIndex == 0) {
-            newGrid[newTrainElementLocalCoordinates] = false;
+            newGrid.set(newTrainElementLocalCoordinates);
         }
 
         byte newTrainElementContent = previousTrainElement.content;
@@ -206,7 +202,7 @@ final class MapState {
         // No content for head
         if (trainElementIndex != 0) {
             if (newTrainElementContent != TrainElementContent.NO_CONTENT) {
-                if (canEmpty(newGrid, monsterOutsGrid[newTrainElementLocalCoordinates], newTrainElementContent)) {
+                if (canEmpty(monsterOutsGrid[newTrainElementLocalCoordinates], newTrainElementContent)) {
                     newTrainElementContent = TrainElementContent.NO_CONTENT;
                 }
             }
@@ -217,7 +213,6 @@ final class MapState {
                     int monsterInCoordinates = monsterIns[0];
                     int element = level.grid[monsterInCoordinates];
                     newTrainElementContent = MapElement.MONSTER[element];
-                    newGrid[monsterInCoordinates] = false;
                     monsterInsIndex -= 1 << Arrays.binarySearch(level.monsterIns, monsterInCoordinates);
                     monsterInsGrid = level.monsterInsGrids[monsterInsIndex];
                 }
@@ -230,7 +225,6 @@ final class MapState {
     }
 
     private boolean canEmpty(
-            @NotNull boolean[] grid,
             @Nullable int[] monsterOuts,
             byte newTrainElementContent) {
         if (monsterOuts != null) {
@@ -263,23 +257,23 @@ final class MapState {
     }
 
     private void addAvailableDirections(
-            @NotNull boolean[] grid,
+            @NotNull BitSet grid,
             @NotNull TrainElement[] trainElements,
             @Nullable LinkedIntElement trainPath,
             @NotNull LinkedList<MapState> nextStates) {
         TrainElement trainHead = trainElements[0];
         int currentLine = trainHead.coordinates >> 16;
         int currentColumn = trainHead.coordinates & 65535;
-        if ((currentLine > 0) && grid[((currentLine - 1) * level.width) + currentColumn]) {
+        if ((currentLine > 0) && (!grid.get(((currentLine - 1) * level.width) + currentColumn))) {
             nextStates.add(createMapState(grid, trainElements, trainPath, ((currentLine - 1) << 16) + currentColumn));
         }
-        if ((currentLine < (level.height - 1)) && grid[((currentLine + 1) * level.width) + currentColumn]) {
+        if ((currentLine < (level.height - 1)) && (!grid.get(((currentLine + 1) * level.width) + currentColumn))) {
             nextStates.add(createMapState(grid, trainElements, trainPath, ((currentLine + 1) << 16) + currentColumn));
         }
-        if ((currentColumn > 0) && grid[(currentLine * level.width) + currentColumn - 1]) {
+        if ((currentColumn > 0) && (!grid.get((currentLine * level.width) + currentColumn - 1))) {
             nextStates.add(createMapState(grid, trainElements, trainPath, (currentLine << 16) + currentColumn - 1));
         }
-        if ((currentColumn < (level.width - 1)) && grid[(currentLine * level.width) + currentColumn + 1]) {
+        if ((currentColumn < (level.width - 1)) && (!grid.get((currentLine * level.width) + currentColumn + 1))) {
             nextStates.add(createMapState(grid, trainElements, trainPath, (currentLine << 16) + currentColumn + 1));
         }
     }

@@ -22,11 +22,11 @@ public class LevelTest
         List<MapState> mapStates = level.createMapStates();
         assertEquals(mapStates.size(), 1);
         states.add(mapStates.get(0));
-        boolean grid[] = null;
-        while((grid == null) && (! states.isEmpty())){
+        boolean solution = false;
+        while((! solution) && (! states.isEmpty())){
             MapState nextCandidate = states.pop();
-            grid = nextCandidate.processState(states);
-            if(grid != null) {
+            solution = nextCandidate.processState(states);
+            if(solution) {
                 //assertArrayEquals(nextCandidate.previousTrainPath, new Direction[]{Direction.RIGHT, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT, Direction.RIGHT});
             }
         }
