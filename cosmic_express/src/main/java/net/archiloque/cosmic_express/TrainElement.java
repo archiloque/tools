@@ -1,23 +1,16 @@
 package net.archiloque.cosmic_express;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 class TrainElement {
 
-    final int trainElementStatus;
+    final byte trainElementStatus;
 
-    final int content;
-
-    final boolean head;
+    final byte content;
 
     final int coordinates;
 
-    TrainElement(boolean head,
-                 int trainElementStatus,
-                 int content,
+    TrainElement(byte trainElementStatus,
+                 byte content,
                  int coordinates) {
-        this.head = head;
         this.trainElementStatus = trainElementStatus;
         this.content = content;
         this.coordinates = coordinates;

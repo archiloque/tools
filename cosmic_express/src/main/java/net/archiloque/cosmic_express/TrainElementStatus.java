@@ -5,7 +5,7 @@ final class TrainElementStatus {
     private TrainElementStatus(){
     }
 
-    final static int RUNNING = 0;
-    final static int WAITING = 1;
-    final static int EXITED = 2;
+    final static byte RUNNING = 0;
+    final static byte WAITING = 1;
+    final static byte EXITED = 2;
 }

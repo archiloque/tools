@@ -5,7 +5,7 @@ final class TrainElementContent {
     private TrainElementContent(){
     }
 
-    final static int NO_CONTENT = 0;
-    final static int MONSTER_1 = 1;
-    final static int MONSTER_2 = 2;
+    final static byte NO_CONTENT = 0;
+    final static byte MONSTER_1 = 1;
+    final static byte MONSTER_2 = 2;
 }

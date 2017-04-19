@@ -25,7 +25,7 @@ public class LevelTest
         List<MapState> mapStates = level.createMapState();
         assertEquals(mapStates.size(), 1);
         states.add(mapStates.get(0));
-        int grid[] = null;
+        byte grid[] = null;
         while((grid == null) && (! states.isEmpty())){
             MapState nextCandidate = states.pop();
             grid = nextCandidate.processState(states);

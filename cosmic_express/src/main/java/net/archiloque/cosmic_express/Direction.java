@@ -5,10 +5,10 @@ final class Direction {
     private Direction(){
     }
 
-    final static int UP = 0;
-    final static int DOWN = 1;
-    final static int LEFT = 2;
-    final static int RIGHT = 3;
+    final static byte UP = 0;
+    final static byte DOWN = 1;
+    final static byte LEFT = 2;
+    final static byte RIGHT = 3;
 
     static char toChar(int direction) {
         if(direction == UP) {

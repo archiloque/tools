@@ -7,8 +7,8 @@ import java.util.Map;
 
 class LevelParser {
 
-    final @NotNull Map<Integer, Character> elementsToChars = new HashMap<>();
-    final @NotNull Map<Character, Integer> charsToElements = new HashMap<>();
+    final @NotNull Map<Byte, Character> elementsToChars = new HashMap<>();
+    final @NotNull Map<Character, Byte> charsToElements = new HashMap<>();
 
     LevelParser() {
         elementsToChars.put(MapElement.ENTRY_INDEX, 'I');
@@ -47,7 +47,7 @@ class LevelParser {
             }
             for (int columnIndex = 0; columnIndex < columnsNumber; columnIndex++) {
                 Character elementChar = line.charAt(columnIndex);
-                Integer elementElement = charsToElements.get(elementChar);
+                Byte elementElement = charsToElements.get(elementChar);
                 if (elementElement != null) {
                     level.setElement(elementElement, new Coordinates(lineIndex, columnIndex));
                     if (elementElement == MapElement.ENTRY_INDEX) {
