@@ -89,7 +89,7 @@ final class MapState {
         this.exitCoordinates = exitCoordinates;
     }
 
-    @Nullable byte[] processState(LinkedList<MapState> nextStates) {
+    @Nullable byte[] processState(@NotNull LinkedList<MapState> nextStates) {
         byte[] grid = cloneGrid();
 
         TrainElement[] trainElements = processTrainElements(grid);
@@ -104,7 +104,7 @@ final class MapState {
             nextStates.addFirst(createMapState(grid, trainElements, previousTrainPath, -1));
             return null;
         } else {
-            @NotNull LinkedIntElement trainPath = createTrainPath();
+            @Nullable LinkedIntElement trainPath = createTrainPath();
             addAvailableDirections(grid, trainElements, trainPath, nextStates);
             return null;
         }
@@ -116,7 +116,11 @@ final class MapState {
         return grid;
     }
 
-    private @NotNull MapState createMapState(@NotNull byte[] grid, @NotNull TrainElement[] trainElements, LinkedIntElement trainPath, int targetCoordinates) {
+    private @NotNull MapState createMapState(
+            @NotNull byte[] grid,
+            @NotNull TrainElement[] trainElements,
+            @Nullable LinkedIntElement trainPath,
+            int targetCoordinates) {
         return new MapState(
                 level,
                 grid,
@@ -139,7 +143,7 @@ final class MapState {
         }
     }
 
-    private @Nullable TrainElement[] processTrainElements(byte[] grid) {
+    private @Nullable TrainElement[] processTrainElements(@NotNull byte[] grid) {
         TrainElement[] trainElements = new TrainElement[level.trainSize];
         for (int trainElementIndex = 0; trainElementIndex < level.trainSize; trainElementIndex++) {
             TrainElement trainElement = processTrainElement(grid, trainElementIndex);
@@ -152,7 +156,7 @@ final class MapState {
         return trainElements;
     }
 
-    private @Nullable TrainElement processTrainElement(byte[] grid, int trainElementIndex) {
+    private @Nullable TrainElement processTrainElement(@NotNull byte[] grid, int trainElementIndex) {
         TrainElement previousTrainElement = previousTrainElements[trainElementIndex];
 
         // Already exited ?
@@ -162,14 +166,16 @@ final class MapState {
 
         // Should still wait ?
         if (previousTrainElement.trainElementStatus == TrainElementStatus.WAITING) {
-            if ((trainElementIndex != 0) && (previousTrainElements[trainElementIndex - 1].trainElementStatus == TrainElementStatus.WAITING)) {
+            if (
+                    (trainElementIndex != 0) &&
+                            (previousTrainElements[trainElementIndex - 1].trainElementStatus == TrainElementStatus.WAITING)
+                    ) {
                 return previousTrainElement;
             }
         }
 
         // Will exit ?
-        if ((previousTrainElement.trainElementStatus == TrainElementStatus.RUNNING) &&
-                (previousTrainElement.coordinates == exitCoordinates)) {
+        if (previousTrainElement.coordinates == exitCoordinates) {
             if (previousTrainElement.content != TrainElementContent.NO_CONTENT) {
                 return null;
             } else {
@@ -216,7 +222,10 @@ final class MapState {
                 newTrainElementCoordinates);
     }
 
-    private boolean canEmpty(byte[] grid, int[] monsterOuts, byte newTrainElementContent) {
+    private boolean canEmpty(
+            @NotNull byte[] grid,
+            @Nullable int[] monsterOuts,
+            byte newTrainElementContent) {
         if (monsterOuts != null) {
             int outBoardEmptyElement = MapElement.outBoardEmptyElement(newTrainElementContent);
             for (int monsterOutCoordinates : monsterOuts) {
@@ -234,20 +243,25 @@ final class MapState {
     }
 
 
-    private int calculateNewCoordinates(@NotNull TrainElement trainElement, int trainElementIndex, int targetPosition) {
+    private int calculateNewCoordinates(
+            @NotNull TrainElement trainElement,
+            int trainElementIndex,
+            int targetPosition) {
         if (trainElement.trainElementStatus == TrainElementStatus.WAITING) {
             // Entering the board
             return level.entry;
         } else if (trainElementIndex == 0) {
             return targetPosition;
         } else {
-            TrainElement previousTrainElement = previousTrainElements[trainElementIndex - 1];
-            return previousTrainElement.coordinates;
+            return previousTrainElements[trainElementIndex - 1].coordinates;
         }
     }
 
     private void addAvailableDirections(
-            @NotNull byte[] grid, @NotNull TrainElement[] trainElements, @Nullable LinkedIntElement trainPath, @NotNull LinkedList<MapState> nextStates) {
+            @NotNull byte[] grid,
+            @NotNull TrainElement[] trainElements,
+            @Nullable LinkedIntElement trainPath,
+            @NotNull LinkedList<MapState> nextStates) {
         TrainElement trainHead = trainElements[0];
         int currentLine = trainHead.coordinates >> 16;
         int currentColumn = trainHead.coordinates & 65535;
