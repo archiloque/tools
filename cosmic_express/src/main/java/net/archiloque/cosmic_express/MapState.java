@@ -226,12 +226,11 @@ final class MapState {
 
     private boolean canEmpty(
             @Nullable int[] monsterOuts,
-            byte newTrainElementContent) {
+            byte trainElementContent) {
         if (monsterOuts != null) {
-            int outBoardEmptyElement = MapElement.outBoardEmptyElement(newTrainElementContent);
             for (int monsterOutCoordinates : monsterOuts) {
                 int monsterOutElement = level.grid[monsterOutCoordinates];
-                if (outBoardEmptyElement == monsterOutElement) {
+                if (trainElementContent == monsterOutElement) {
                     newMissingNumberOfMonsters--;
                     monsterOutsIndex -= 1 << Arrays.binarySearch(level.monsterOuts, monsterOutCoordinates);
                     monsterOutsGrid = level.monsterOutsGrids[monsterOutsIndex];
@@ -261,9 +260,9 @@ final class MapState {
             @NotNull TrainElement[] trainElements,
             @Nullable LinkedIntElement trainPath,
             @NotNull LinkedList<MapState> nextStates) {
-        TrainElement trainHead = trainElements[0];
-        int currentLine = trainHead.coordinates >> 16;
-        int currentColumn = trainHead.coordinates & 65535;
+        int trainHeadCoordinates = trainElements[0].coordinates;
+        int currentLine = trainHeadCoordinates >> 16;
+        int currentColumn = trainHeadCoordinates & 65535;
         if ((currentLine > 0) && (!grid.get(((currentLine - 1) * level.width) + currentColumn))) {
             nextStates.add(createMapState(grid, trainElements, trainPath, ((currentLine - 1) << 16) + currentColumn));
         }

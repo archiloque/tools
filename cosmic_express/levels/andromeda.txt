@@ -1,5 +1,6 @@
 # I : Entry
 # Q : Exit
+# O : Obstacle
 # A : Monster 1 (purple) in
 # a : Monster 1 out
 # B : Monster 2 (green) in
