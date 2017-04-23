@@ -284,7 +284,7 @@ final class MapState {
 
         grid.set(currentPosition);
 
-        checkTrainPathForDebug(trainPath);
+        // checkTrainPathForDebug(trainPath);
 
         BitSet newGridCurrentSegment = enteredNewSegment ?
                 new BitSet(level.width * level.height) :
@@ -296,12 +296,14 @@ final class MapState {
         boolean isFirstColumn = (currentColumn == 0);
         boolean isLastColumn = (currentColumn == (level.width - 1));
 
+        boolean isANewSegmentOrNearAMonsterInOrOut = enteredNewSegment || (monsterInsGrid[currentPosition] != null) || (monsterOutsGrid[currentPosition] != null);
+
         {
             // up
             int targetPositionUp = currentPosition - level.width;
             if ((!isFirstLine) &&
                     (!grid.get(targetPositionUp))) {
-                if (enteredNewSegment || (monsterInsGrid[currentPosition] != null) || (monsterOutsGrid[currentPosition] != null) ||
+                if (isANewSegmentOrNearAMonsterInOrOut ||
                         (
                                 ((currentLine == 1) || (!previousGridSegment.get(targetPositionUp - level.width))) && // up
                                         (isFirstColumn || (!previousGridSegment.get(targetPositionUp - 1)) && // left
@@ -317,7 +319,7 @@ final class MapState {
             int targetPositionDown = currentPosition + level.width;
             if ((!isLastLine) &&
                     (!grid.get(targetPositionDown))) {
-                if (enteredNewSegment || (monsterInsGrid[currentPosition] != null) || (monsterOutsGrid[currentPosition] != null) ||
+                if (isANewSegmentOrNearAMonsterInOrOut ||
                         (
                                 ((currentLine == (level.height - 2)) || (!previousGridSegment.get(targetPositionDown + level.width))) && // down
                                         (isFirstColumn || (!previousGridSegment.get(targetPositionDown - 1)) && // left
@@ -333,7 +335,7 @@ final class MapState {
             int targetPositionLeft = currentPosition - 1;
             if ((!isFirstColumn) &&
                     (!grid.get(targetPositionLeft))) {
-                if (enteredNewSegment || (monsterInsGrid[currentPosition] != null) || (monsterOutsGrid[currentPosition] != null) ||
+                if (isANewSegmentOrNearAMonsterInOrOut ||
                         (
                                 (isFirstLine || (!previousGridSegment.get(targetPositionLeft - level.width))) && // up
                                         (isLastLine || (!previousGridSegment.get(targetPositionLeft + level.width))) && // down
@@ -357,7 +359,7 @@ final class MapState {
             int targetPositionRight = currentPosition + 1;
             if ((!isLastColumn) &&
                     (!grid.get(targetPositionRight))) {
-                if (enteredNewSegment || (monsterInsGrid[currentPosition] != null) || (monsterOutsGrid[currentPosition] != null) ||
+                if (isANewSegmentOrNearAMonsterInOrOut ||
                         (
                                 (isFirstLine || (!previousGridSegment.get(targetPositionRight - level.width))) && // up
                                         (isLastLine || (!previousGridSegment.get(targetPositionRight + level.width))) && // down
