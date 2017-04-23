@@ -112,11 +112,13 @@ final class Level {
         }
 
         BitSet originalGrid = new BitSet(height * width);
-        for(int i = 0; i < height * width; i++) {
-            if(! MapElement.CROSSABLE[grid[i]]) {
+        for (int i = 0; i < height * width; i++) {
+            if (!MapElement.CROSSABLE[grid[i]]) {
                 originalGrid.set(i);
             }
         }
+
+        BitSet previousGridCurrentSegment = new BitSet(height * width);
 
         List<MapState> result = new ArrayList<>(exitCoordinates.size());
         for (int exitIndex = 0; exitIndex < exitCoordinates.size(); exitIndex++) {
@@ -130,15 +132,16 @@ final class Level {
             }
             result.add(new MapState(this,
                             gridForExit,
+                            previousGridCurrentSegment,
                             numberOfMonsters,
                             -1,
                             trainElements,
                             null,
+                            (currentExit.line << 16) + currentExit.column,
                             monstersInsPossibilities - 1,
                             monsterInsGrids[monstersInsPossibilities - 1],
                             monstersOutsPossibilities - 1,
-                            monsterOutsGrids[monstersOutsPossibilities - 1],
-                            (currentExit.line << 16) + currentExit.column
+                            monsterOutsGrids[monstersOutsPossibilities - 1]
                     )
             );
 

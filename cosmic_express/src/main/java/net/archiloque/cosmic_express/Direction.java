@@ -24,4 +24,18 @@ final class Direction {
         }
     }
 
+    static char toCharEntry(int direction) {
+        if (direction == UP) {
+            return '⇧';
+        } else if (direction == DOWN) {
+            return '⇩';
+        } else if (direction == LEFT) {
+            return '⇦';
+        } else if (direction == RIGHT) {
+            return '⇨';
+        } else {
+            throw new RuntimeException("Unknwown direction " + direction);
+        }
+    }
+
 }

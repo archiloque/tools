@@ -1,0 +1,9 @@
+Level 06
+XXXX→→→→↓
+XXBB↑←←b↓
+XX→→→→↑b↓
+⇨↓↑←←←←XQ
+↓←XX→→↑aX
+→↓AA↑←←aX
+X→→→→→↑XX
+

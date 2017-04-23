@@ -1,0 +1,18 @@
+# I : Entry
+# Q : Exit
+# O : Obstacle
+# A : Monster 1 (purple) in
+# a : Monster 1 out
+# B : Monster 2 (green) in
+# b : Monster 2 out
+
+[Level 06]
+train_size = 2
+XXXXXXXXX
+XXBBXXXbX
+XXXXXXXbX
+IXXXXXXXQ
+XXXXXXXaX
+XXAAXXXaX
+XXXXXXXXX
+

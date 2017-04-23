@@ -3,15 +3,24 @@ package net.archiloque.cosmic_express;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.List;
 
+/**
+ * Represents a state of the level Map.
+ */
 final class MapState {
+
+    static int[] TRAIN_PATH_TO_CHECK = null;
+
+    static boolean FOUND_TRAIN_PATH = false;
 
     /**
      * Path of the train leading to the current state.
      */
-    final @Nullable LinkedIntElement previousTrainPath;
+    final @Nullable CoordinatesLinkedItem previousTrainPath;
 
     /**
      * Current Level.
@@ -21,7 +30,7 @@ final class MapState {
     /**
      * False = position is empty before executing the state.
      */
-    private final @NotNull BitSet previousGrid;
+    final @NotNull BitSet previousGrid;
 
     /**
      * Target of the current step step be ? -1 = we are exiting
@@ -32,6 +41,10 @@ final class MapState {
      * The train elements before executing the state
      */
     private final @NotNull TrainElement[] previousTrainElements;
+
+    private final @NotNull BitSet previousGridSegment;
+
+    private boolean enteredNewSegment = false;
 
     private int newMissingNumberOfMonsters;
 
@@ -63,29 +76,31 @@ final class MapState {
     MapState(
             @NotNull Level level,
             @NotNull BitSet previousGrid,
+            @NotNull BitSet previousGridSegment,
             int previousNumberOfMonsters,
             int currentStepTargetCoordinates,
             @NotNull TrainElement[] previousTrainElements,
-            @Nullable LinkedIntElement previousTrainPath,
+            @Nullable CoordinatesLinkedItem previousTrainPath,
+            int exitCoordinates,
             int monsterInsIndex,
             int[][] monsterInsGrid,
             int monsterOutsIndex,
-            int[][] monsterOutsGrid,
-            int exitCoordinates
+            int[][] monsterOutsGrid
 
     ) {
         this.level = level;
         this.previousGrid = previousGrid;
+        this.previousGridSegment = previousGridSegment;
         this.previousTrainPath = previousTrainPath;
-
         this.currentStepTargetCoordinates = currentStepTargetCoordinates;
         this.previousTrainElements = previousTrainElements;
         this.newMissingNumberOfMonsters = previousNumberOfMonsters;
+        this.exitCoordinates = exitCoordinates;
+
         this.monsterInsIndex = monsterInsIndex;
         this.monsterInsGrid = monsterInsGrid;
         this.monsterOutsIndex = monsterOutsIndex;
         this.monsterOutsGrid = monsterOutsGrid;
-        this.exitCoordinates = exitCoordinates;
     }
 
     boolean processState(@NotNull LinkedList<MapState> nextStates) {
@@ -101,11 +116,11 @@ final class MapState {
             return (newMissingNumberOfMonsters == 0);
         } else if (trainElements[0].trainElementStatus == TrainElementStatus.EXITED) {
             // we are exiting : we go to the exit
-            nextStates.add(createMapState(newGrid, trainElements, previousTrainPath, -1));
+            nextStates.add(createMapState(newGrid, previousGridSegment, trainElements, previousTrainPath, -1));
             return false;
         } else {
             // running normally
-            @Nullable LinkedIntElement trainPath = createTrainPath();
+            @Nullable CoordinatesLinkedItem trainPath = createTrainPath();
             addAvailableDirections(newGrid, trainElements, trainPath, nextStates);
             return false;
         }
@@ -113,26 +128,28 @@ final class MapState {
 
     private @NotNull MapState createMapState(
             @NotNull BitSet grid,
+            @NotNull BitSet gridCurrentSegment,
             @NotNull TrainElement[] trainElements,
-            @Nullable LinkedIntElement trainPath,
+            @Nullable CoordinatesLinkedItem trainPath,
             int targetCoordinates) {
         return new MapState(
                 level,
                 grid,
+                gridCurrentSegment,
                 newMissingNumberOfMonsters,
                 targetCoordinates,
                 trainElements,
                 trainPath,
+                exitCoordinates,
                 monsterInsIndex,
                 monsterInsGrid,
                 monsterOutsIndex,
-                monsterOutsGrid,
-                exitCoordinates);
+                monsterOutsGrid);
     }
 
-    private @Nullable LinkedIntElement createTrainPath() {
+    private @Nullable CoordinatesLinkedItem createTrainPath() {
         if (currentStepTargetCoordinates != -1) {
-            return new LinkedIntElement(currentStepTargetCoordinates, previousTrainPath);
+            return new CoordinatesLinkedItem(currentStepTargetCoordinates, previousTrainPath);
         } else {
             return previousTrainPath;
         }
@@ -193,17 +210,15 @@ final class MapState {
         int newTrainElementLocalCoordinates =
                 ((newTrainElementCoordinates >> 16) * level.width) + (newTrainElementCoordinates & 65535);
 
-        if (trainElementIndex == 0) {
-            newGrid.set(newTrainElementLocalCoordinates);
-        }
-
         byte newTrainElementContent = previousTrainElement.content;
 
         // No content for head
         if (trainElementIndex != 0) {
             if (newTrainElementContent != TrainElementContent.NO_CONTENT) {
-                if (canEmpty(monsterOutsGrid[newTrainElementLocalCoordinates], newTrainElementContent)) {
+                int[] monsterOuts = monsterOutsGrid[newTrainElementLocalCoordinates];
+                if (canEmpty(monsterOuts, newTrainElementContent)) {
                     newTrainElementContent = TrainElementContent.NO_CONTENT;
+                    enteredNewSegment = true;
                 }
             }
 
@@ -215,6 +230,7 @@ final class MapState {
                     newTrainElementContent = MapElement.MONSTER[element];
                     monsterInsIndex -= 1 << Arrays.binarySearch(level.monsterIns, monsterInCoordinates);
                     monsterInsGrid = level.monsterInsGrids[monsterInsIndex];
+                    enteredNewSegment = true;
                 }
             }
         }
@@ -258,22 +274,207 @@ final class MapState {
     private void addAvailableDirections(
             @NotNull BitSet grid,
             @NotNull TrainElement[] trainElements,
-            @Nullable LinkedIntElement trainPath,
+            @Nullable CoordinatesLinkedItem trainPath,
             @NotNull LinkedList<MapState> nextStates) {
+
         int trainHeadCoordinates = trainElements[0].coordinates;
         int currentLine = trainHeadCoordinates >> 16;
         int currentColumn = trainHeadCoordinates & 65535;
-        if ((currentLine > 0) && (!grid.get(((currentLine - 1) * level.width) + currentColumn))) {
-            nextStates.add(createMapState(grid, trainElements, trainPath, ((currentLine - 1) << 16) + currentColumn));
+        int currentPosition = (currentLine * level.width) + currentColumn;
+
+        grid.set(currentPosition);
+
+        checkTrainPathForDebug(trainPath);
+
+        BitSet newGridCurrentSegment = enteredNewSegment ?
+                new BitSet(level.width * level.height) :
+                ((BitSet) previousGridSegment.clone());
+        newGridCurrentSegment.set(currentPosition);
+
+        boolean isFirstLine = (currentLine == 0);
+        boolean isLastLine = (currentLine == (level.height - 1));
+        boolean isFirstColumn = (currentColumn == 0);
+        boolean isLastColumn = (currentColumn == (level.width - 1));
+
+        {
+            // up
+            int targetPositionUp = currentPosition - level.width;
+            if ((!isFirstLine) &&
+                    (!grid.get(targetPositionUp))) {
+                if (enteredNewSegment || (monsterInsGrid[currentPosition] != null) || (monsterOutsGrid[currentPosition] != null) ||
+                        (
+                                ((currentLine == 1) || (!previousGridSegment.get(targetPositionUp - level.width))) && // up
+                                        (isFirstColumn || (!previousGridSegment.get(targetPositionUp - 1)) && // left
+                                                (isLastColumn || (!previousGridSegment.get(targetPositionUp + 1))) // right
+                                        ))) {
+                    nextStates.add(createMapState(grid, newGridCurrentSegment, trainElements, trainPath, ((currentLine - 1) << 16) + currentColumn));
+                }
+            }
         }
-        if ((currentLine < (level.height - 1)) && (!grid.get(((currentLine + 1) * level.width) + currentColumn))) {
-            nextStates.add(createMapState(grid, trainElements, trainPath, ((currentLine + 1) << 16) + currentColumn));
+
+        {
+            // down
+            int targetPositionDown = currentPosition + level.width;
+            if ((!isLastLine) &&
+                    (!grid.get(targetPositionDown))) {
+                if (enteredNewSegment || (monsterInsGrid[currentPosition] != null) || (monsterOutsGrid[currentPosition] != null) ||
+                        (
+                                ((currentLine == (level.height - 2)) || (!previousGridSegment.get(targetPositionDown + level.width))) && // down
+                                        (isFirstColumn || (!previousGridSegment.get(targetPositionDown - 1)) && // left
+                                                (isLastColumn || (!previousGridSegment.get(targetPositionDown + 1))) // right
+                                        ))) {
+                    nextStates.add(createMapState(grid, newGridCurrentSegment, trainElements, trainPath, ((currentLine + 1) << 16) + currentColumn));
+                }
+            }
         }
-        if ((currentColumn > 0) && (!grid.get((currentLine * level.width) + currentColumn - 1))) {
-            nextStates.add(createMapState(grid, trainElements, trainPath, (currentLine << 16) + currentColumn - 1));
+
+        {
+            // left
+            int targetPositionLeft = currentPosition - 1;
+            if ((!isFirstColumn) &&
+                    (!grid.get(targetPositionLeft))) {
+                if (enteredNewSegment || (monsterInsGrid[currentPosition] != null) || (monsterOutsGrid[currentPosition] != null) ||
+                        (
+                                (isFirstLine || (!previousGridSegment.get(targetPositionLeft - level.width))) && // up
+                                        (isLastLine || (!previousGridSegment.get(targetPositionLeft + level.width))) && // down
+                                        ((currentColumn == 1) || (!previousGridSegment.get(targetPositionLeft - 1))  // left
+                                        ))) {
+                    nextStates.add(createMapState(grid, newGridCurrentSegment, trainElements, trainPath, (currentLine << 16) + currentColumn - 1));
+                /*} else {
+                    @NotNull String[] gridToPrint = bitSetToStringGrid(previousGridSegment);
+                    gridToPrint[currentLine] =
+                            gridToPrint[currentLine].substring(0, currentColumn) +
+                                    'X' +
+                                    ((currentColumn == (level.width - 1)) ? "" : gridToPrint[currentLine].substring(currentColumn + 1));
+                    System.out.println(String.join("\n", gridToPrint));
+                    System.out.println("");*/
+                }
+            }
         }
-        if ((currentColumn < (level.width - 1)) && (!grid.get((currentLine * level.width) + currentColumn + 1))) {
-            nextStates.add(createMapState(grid, trainElements, trainPath, (currentLine << 16) + currentColumn + 1));
+
+        {
+            // right
+            int targetPositionRight = currentPosition + 1;
+            if ((!isLastColumn) &&
+                    (!grid.get(targetPositionRight))) {
+                if (enteredNewSegment || (monsterInsGrid[currentPosition] != null) || (monsterOutsGrid[currentPosition] != null) ||
+                        (
+                                (isFirstLine || (!previousGridSegment.get(targetPositionRight - level.width))) && // up
+                                        (isLastLine || (!previousGridSegment.get(targetPositionRight + level.width))) && // down
+                                        ((currentColumn == (level.width - 2)) || (!previousGridSegment.get(targetPositionRight + 1))  // right
+                                        ))) {
+                    nextStates.add(createMapState(grid, newGridCurrentSegment, trainElements, trainPath, (currentLine << 16) + currentColumn + 1));
+                }
+            }
+        }
+    }
+
+    /**
+     * Used for debugging
+     */
+    private void checkTrainPathForDebug(@Nullable CoordinatesLinkedItem trainPath) {
+        if ((TRAIN_PATH_TO_CHECK != null) && (!FOUND_TRAIN_PATH)) {
+            List<Integer> trainPathAsArray = (trainPath == null) ? new ArrayList<>() : trainPath.getAsArray(level);
+            int[] currentPathArray = Level.listToPrimitiveIntArray(trainPathAsArray);
+            if (Arrays.equals(currentPathArray, TRAIN_PATH_TO_CHECK)) {
+                FOUND_TRAIN_PATH = true;
+                char[][] solutionAsStringArray = printableGridAsCharArrays();
+                if (trainPath != null) {
+                    solutionAsStringArray[trainPath.element >> 16][trainPath.element & 65535] = '■';
+                }
+                for (char[] solutionLine : solutionAsStringArray) {
+                    System.out.println(solutionLine);
+                }
+            }
+        }
+    }
+
+    /**
+     * Used for debugging.
+     */
+    public @NotNull String[] bitSetToStringGrid(@NotNull BitSet bitSet) {
+        String[] result = new String[level.height];
+        for (int lineIndex = 0; lineIndex < level.height; lineIndex++) {
+            String line = "";
+            for (int columnIndex = 0; columnIndex < level.width; columnIndex++) {
+                line += bitSet.get(lineIndex * level.width + columnIndex) ? "1" : "0";
+            }
+            result[lineIndex] = line;
+        }
+        return result;
+    }
+
+    @NotNull String[] printableGrid() {
+        char[][] lines = printableGridAsCharArrays();
+        String[] result = new String[lines.length];
+        for (int i = 0; i < lines.length; i++) {
+            result[i] = new String(lines[i]);
+        }
+        return result;
+    }
+
+    @NotNull
+    private char[][] printableGridAsCharArrays() {
+        LevelParser levelParser = new LevelParser();
+        char[][] result = new char[level.height][];
+        for (int lineIndex = 0; lineIndex < level.height; lineIndex++) {
+            char[] lineChar = new char[level.width];
+            for (int columnIndex = 0; columnIndex < level.width; columnIndex++) {
+                byte element = level.grid[(lineIndex * level.width) + columnIndex];
+                Character character = levelParser.elementsToChars.get(element);
+                if (character == null) {
+                    throw new RuntimeException("Unknown element [" + element + "]");
+                }
+                if (character == MapElement.EXIT_INDEX) {
+                    character = MapElement.EMPTY_INDEX;
+                }
+                lineChar[columnIndex] = character;
+            }
+            result[lineIndex] = lineChar;
+        }
+
+        Coordinates currentPoint = new Coordinates(level.entry >> 16, level.entry & 65535);
+        result[level.entry >> 16][level.entry & 65535] = levelParser.elementsToChars.get(MapElement.ENTRY_INDEX);
+        result[exitCoordinates >> 16][exitCoordinates & 65535] = levelParser.elementsToChars.get(MapElement.EXIT_INDEX);
+
+        int[] trainPath = (previousTrainPath == null) ? new int[]{} : Level.listToPrimitiveIntArray(previousTrainPath.getAsArray(level));
+        for (int i = 0; i < trainPath.length - 1; i++) {
+            int from = trainPath[i];
+            int fromLine = from >> 16;
+            int fromColumn = from & 65535;
+            int to = trainPath[i + 1];
+            int toLine = to >> 16;
+            int toColumn = to & 65535;
+            int direction;
+
+            if (toLine == (fromLine + 1)) {
+                direction = Direction.DOWN;
+            } else if (toLine == (fromLine - 1)) {
+                direction = Direction.UP;
+            } else if (toColumn == (fromColumn - 1)) {
+                direction = Direction.LEFT;
+            } else {
+                direction = Direction.RIGHT;
+            }
+            result[fromLine][fromColumn] = (i == 0) ? Direction.toCharEntry(direction) : Direction.toChar(direction);
+            currentPoint = coordinatesFromDirection(currentPoint, direction);
+        }
+        result[exitCoordinates >> 16][exitCoordinates & 65535] = levelParser.elementsToChars.get(MapElement.EXIT_INDEX);
+        return result;
+    }
+
+    private static @NotNull Coordinates coordinatesFromDirection(@NotNull Coordinates coordinates, int direction) {
+        switch (direction) {
+            case Direction.UP:
+                return new Coordinates(coordinates.line - 1, coordinates.column);
+            case Direction.DOWN:
+                return new Coordinates(coordinates.line + 1, coordinates.column);
+            case Direction.LEFT:
+                return new Coordinates(coordinates.line, coordinates.column - 1);
+            case Direction.RIGHT:
+                return new Coordinates(coordinates.line, coordinates.column + 1);
+            default:
+                throw new RuntimeException("Unknown direction [" + direction + "]");
         }
     }
 

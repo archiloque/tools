@@ -7,7 +7,7 @@ class LinkedList<E> {
 
     private ListElement<E> current;
 
-    LinkedList(){
+    LinkedList() {
     }
 
     void add(@NotNull E element) {
@@ -15,7 +15,7 @@ class LinkedList<E> {
     }
 
     @Nullable E pop() {
-        if(current != null) {
+        if (current != null) {
             E currentElement = current.element;
             current = current.previous;
             return currentElement;
