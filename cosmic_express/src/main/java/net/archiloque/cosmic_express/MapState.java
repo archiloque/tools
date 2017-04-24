@@ -104,6 +104,14 @@ final class MapState {
     }
 
     boolean processState(@NotNull LinkedList<MapState> nextStates) {
+        if (currentStepTargetCoordinates == exitCoordinates) {
+            boolean isTrainEmpty = true;
+            for (int i = 1; isTrainEmpty && (i < level.trainSize); i++) {
+                isTrainEmpty = (previousTrainElements[i].content == TrainElementContent.NO_CONTENT);
+            }
+
+            return (newMissingNumberOfMonsters == 0) && isTrainEmpty;
+        }
         BitSet newGrid = (BitSet) previousGrid.clone();
 
         TrainElement[] trainElements = processTrainElements(newGrid);
@@ -111,19 +119,10 @@ final class MapState {
             return false;
         }
 
-        // all exited ?
-        if (trainElements[level.trainSize - 1].trainElementStatus == TrainElementStatus.EXITED) {
-            return (newMissingNumberOfMonsters == 0);
-        } else if (trainElements[0].trainElementStatus == TrainElementStatus.EXITED) {
-            // we are exiting : we go to the exit
-            nextStates.add(createMapState(newGrid, previousGridSegment, trainElements, previousTrainPath, -1));
-            return false;
-        } else {
-            // running normally
-            @Nullable CoordinatesLinkedItem trainPath = createTrainPath();
-            addAvailableDirections(newGrid, trainElements, trainPath, nextStates);
-            return false;
-        }
+        // running normally
+        @Nullable CoordinatesLinkedItem trainPath = createTrainPath();
+        addAvailableDirections(newGrid, trainElements, trainPath, nextStates);
+        return false;
     }
 
     private @NotNull MapState createMapState(
@@ -177,11 +176,6 @@ final class MapState {
     private @Nullable TrainElement processTrainElement(@NotNull BitSet newGrid, int trainElementIndex) {
         TrainElement previousTrainElement = previousTrainElements[trainElementIndex];
 
-        // Already exited ?
-        if (previousTrainElement.trainElementStatus == TrainElementStatus.EXITED) {
-            return previousTrainElement;
-        }
-
         // Should still wait ?
         if (previousTrainElement.trainElementStatus == TrainElementStatus.WAITING) {
             if (
@@ -189,19 +183,6 @@ final class MapState {
                             (previousTrainElements[trainElementIndex - 1].trainElementStatus == TrainElementStatus.WAITING)
                     ) {
                 return previousTrainElement;
-            }
-        }
-
-        // Will exit ?
-        if (previousTrainElement.coordinates == exitCoordinates) {
-            if (previousTrainElement.content != TrainElementContent.NO_CONTENT) {
-                return null;
-            } else {
-                return new TrainElement(
-                        TrainElementStatus.EXITED,
-                        TrainElementContent.NO_CONTENT,
-                        -1
-                );
             }
         }
 
@@ -384,7 +365,7 @@ final class MapState {
      */
     private void checkTrainPathForDebug(@Nullable CoordinatesLinkedItem trainPath) {
         if ((TRAIN_PATH_TO_CHECK != null) && (!FOUND_TRAIN_PATH)) {
-            List<Integer> trainPathAsArray = (trainPath == null) ? new ArrayList<>() : trainPath.getAsArray(level);
+            List<Integer> trainPathAsArray = (trainPath == null) ? new ArrayList<>() : trainPath.getAsList(level);
             int[] currentPathArray = Level.listToPrimitiveIntArray(trainPathAsArray);
             if (Arrays.equals(currentPathArray, TRAIN_PATH_TO_CHECK)) {
                 FOUND_TRAIN_PATH = true;
@@ -447,7 +428,16 @@ final class MapState {
         result[level.entry >> 16][level.entry & 65535] = levelParser.elementsToChars.get(MapElement.ENTRY_INDEX);
         result[exitCoordinates >> 16][exitCoordinates & 65535] = levelParser.elementsToChars.get(MapElement.EXIT_INDEX);
 
-        int[] trainPath = (previousTrainPath == null) ? new int[]{} : Level.listToPrimitiveIntArray(previousTrainPath.getAsArray(level));
+        List<Integer> pathAsLIst;
+        if(previousTrainPath != null) {
+            pathAsLIst = previousTrainPath.getAsList(level);
+            if (currentStepTargetCoordinates != -1) {
+                pathAsLIst.add(currentStepTargetCoordinates);
+            }
+        } else {
+            pathAsLIst = new ArrayList<>();
+        }
+        int[] trainPath = Level.listToPrimitiveIntArray(pathAsLIst);
         for (int i = 0; i < trainPath.length - 1; i++) {
             int from = trainPath[i];
             int fromLine = from >> 16;

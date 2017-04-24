@@ -1,0 +1,20 @@
+Level 01
+XXXX→QXXXXXX
+X→→→↑aOXA↓←←
+→↑↓←←←←←←←X↑
+↑A↓Oa→→→→→→↑
+↑X→→↓↑←←←←←⇦
+↑←←←←aOXAXXX
+XXXXOXXXXXXX
+
+Level 02
+XXXOXQXOXXX
+XXXXa↑a↓←←←
+X→→→→↑X→→↓↑
+X↑Ob↓←←bO↓↑
+→↑XO↓→↑O↓←↑
+↑↓←←←↑↓←←X↑
+↑←→→→↑↓→→→↑
+B→↑↓←←←↑←←A
+B↑←←X⇨→→→↑A
+

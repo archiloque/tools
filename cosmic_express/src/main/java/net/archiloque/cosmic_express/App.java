@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -53,7 +54,7 @@ public class App {
         System.out.println(DATE_FORMAT.format(new Date()) +" Calculating problem [" + levelName + "]");
         resultWriter.write(levelName);
         resultWriter.newLine();
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
 
         LinkedList<MapState> states = new LinkedList<>();
         states.add(mapState);
@@ -62,8 +63,8 @@ public class App {
             MapState nextCandidate = states.pop();
             solution = nextCandidate.processState(states);
             if (solution) {
-                long stopTime = System.currentTimeMillis();
-                System.out.println("Solved in " + (((float) (stopTime - startTime)) / 1000));
+                long stopTime = System.nanoTime();
+                System.out.println("Solved in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
                 String[] solutionAsStringArray = nextCandidate.printableGrid();
                 for (String solutionLine : solutionAsStringArray) {
                     resultWriter.write(solutionLine);
@@ -72,8 +73,8 @@ public class App {
             }
         }
         if (!solution) {
-            long stopTime = System.currentTimeMillis();
-            System.out.println("Failed to solve in " + (((float) (stopTime - startTime)) / 1000));
+            long stopTime = System.nanoTime();
+            System.out.println("Failed to solve in "+ LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
         }
         resultWriter.newLine();
         resultWriter.flush();

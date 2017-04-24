@@ -21,7 +21,7 @@ class CoordinatesLinkedItem {
         this.previous = previous;
     }
 
-    @NotNull List<Integer> getAsArray(@NotNull Level level) {
+    @NotNull List<Integer> getAsList(@NotNull Level level) {
         List<Integer> trainPathList = new ArrayList<>();
 
         CoordinatesLinkedItem trainPath = this;

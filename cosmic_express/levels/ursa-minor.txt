@@ -3,7 +3,7 @@
 # O : Obstacle
 # A : Monster 1 (purple) in
 # a : Monster 1 out
-# B : Monster 2 (green) in
+# B : Monster 2 (orange) in
 # b : Monster 2 out
 
 [Level 01]
@@ -71,9 +71,9 @@ XXXXXXXX
 train_size = 3
 XXXOXQXOXXX
 XXXXbXbXXXX
-XXAXXXXaXXX
+XXAXXXXXaXX
 IXXXOXOXXXQ
-XXAXXXXaXXX
+XXAXXXXXaXX
 XXXXBXBXXXX
 XXXXXXXXXXX
 

@@ -7,5 +7,4 @@ final class TrainElementStatus {
 
     final static byte RUNNING = 0;
     final static byte WAITING = 1;
-    final static byte EXITED = 2;
 }

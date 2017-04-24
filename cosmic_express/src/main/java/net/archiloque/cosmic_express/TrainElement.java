@@ -4,6 +4,9 @@ class TrainElement {
 
     final byte trainElementStatus;
 
+    /**
+     * A TrainElementContent
+     */
     final byte content;
 
     final int coordinates;
