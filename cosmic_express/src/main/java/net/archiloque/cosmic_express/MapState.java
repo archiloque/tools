@@ -299,10 +299,12 @@ final class MapState {
         boolean isANewSegmentOrNearAMonsterInOrOut = enteredNewSegment;
         for (int i = 0; (!isANewSegmentOrNearAMonsterInOrOut) && (i < level.trainSize - 1); i++) {
             int currentTrainElementCoordinates = trainElements[i].coordinates;
-            int currentTrainElementLocalCoordinates = ((currentTrainElementCoordinates >> 16) * level.width) + (currentTrainElementCoordinates & 65535);
-            isANewSegmentOrNearAMonsterInOrOut =
-                    (monsterInsGrid[currentTrainElementLocalCoordinates] != null) ||
-                            (monsterOutsGrid[currentTrainElementLocalCoordinates] != null);
+            if (currentTrainElementCoordinates != -1) {
+                int currentTrainElementLocalCoordinates = ((currentTrainElementCoordinates >> 16) * level.width) + (currentTrainElementCoordinates & 65535);
+                isANewSegmentOrNearAMonsterInOrOut =
+                        (monsterInsGrid[currentTrainElementLocalCoordinates] != null) ||
+                                (monsterOutsGrid[currentTrainElementLocalCoordinates] != null);
+            }
         }
         {
             // up
