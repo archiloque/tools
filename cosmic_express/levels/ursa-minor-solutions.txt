@@ -1,0 +1,86 @@
+Level 01
+XXXO→↓b
+→→→→↑↓X
+↑←←A↓←X
+⇨↓↑X↓OQ
+X→↑B→↓↑
+XXXXX→↑
+XXXOXXa
+
+Level 02
+XXXXXXOXX
+⇨→→→↓XXXX
+XXBB↓AAXX
+↓←←←←→↓OX
+↓OXX→↑→↓X
+→↓bb↑aa↓X
+X→→→↑↓←←Q
+XXXXX→→→↑
+
+Level 03
+XX⇨→↓→→↓a
+XXXX↓↑X↓a
+↓←←←←↑←→↓
+↓XABBA↑←Q
+→↓→→→→→↑X
+X↓↑←←←←←b
+X→→→→→→↑b
+
+Level 04
+XA→↓aXB→→↓b
+⇩X↑→→→→↑X→↓
+↓A↑XaXB↓←X↓
+→→↑OOOO↓↑←←
+XXXaXAX→→→↓
+X↓←←←←←↓←←←
+XQXaXA↑←XXb
+
+Level 05
+XXXXXXXXX
+XXXABAXXX
+XX→↓→→→↓X
+⇨→↑→↑X↓←Q
+XXXaXa→↓↑
+XXXXb↓←←↑
+XXXXX→→→↑
+
+Level 06
+XX⇨→↓XXX
+↓←←←←aaX
+↓BXX→→→↓
+↓AXA↑←←Q
+↓B→→→→↑X
+→↓↑←←bbX
+X→→→↑XXX
+
+Level 07 0
+
+Level 07 1
+
+Level 08
+b→→→→→→↓a
+X↑←←←BB→↓
+XXAb↑←←←↓
+⇨→→→→→↓↑Q
+XXAb↓←←↑X
+X↓←←←BB↑X
+b→→→→→→↑a
+
+Level 09
+A→→→↓XXXX
+→↑A↓←aXXX
+↑←X↓OaOXX
+⇩↑←→→→→→Q
+→↓↑←ObOXX
+X↓B↑←bXXX
+B→→→↑XXXX
+
+Level 10
+XXXXXXXXQX
+⇨→→↓→→→→↑X
+XXX↓↑←←XXX
+XXB↓aa↑B↓←
+XXA↓bb↑A↓↑
+XXX→→↓↑←←↑
+XXXXX→→→→↑
+
