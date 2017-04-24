@@ -296,8 +296,14 @@ final class MapState {
         boolean isFirstColumn = (currentColumn == 0);
         boolean isLastColumn = (currentColumn == (level.width - 1));
 
-        boolean isANewSegmentOrNearAMonsterInOrOut = enteredNewSegment || (monsterInsGrid[currentPosition] != null) || (monsterOutsGrid[currentPosition] != null);
-
+        boolean isANewSegmentOrNearAMonsterInOrOut = enteredNewSegment;
+        for (int i = 0; (!isANewSegmentOrNearAMonsterInOrOut) && (i < level.trainSize - 1); i++) {
+            int currentTrainElementCoordinates = trainElements[i].coordinates;
+            int currentTrainElementLocalCoordinates = ((currentTrainElementCoordinates >> 16) * level.width) + (currentTrainElementCoordinates & 65535);
+            isANewSegmentOrNearAMonsterInOrOut =
+                    (monsterInsGrid[currentTrainElementLocalCoordinates] != null) ||
+                            (monsterOutsGrid[currentTrainElementLocalCoordinates] != null);
+        }
         {
             // up
             int targetPositionUp = currentPosition - level.width;

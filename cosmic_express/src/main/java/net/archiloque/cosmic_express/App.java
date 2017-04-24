@@ -7,11 +7,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public class App {
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
@@ -46,7 +50,7 @@ public class App {
     private static void solveProblem(@NotNull String levelName,
                                      @NotNull MapState mapState,
                                      @NotNull BufferedWriter resultWriter) throws IOException {
-        System.out.println("Calculating problem [" + levelName + "]");
+        System.out.println(DATE_FORMAT.format(new Date()) +" Calculating problem [" + levelName + "]");
         resultWriter.write(levelName);
         resultWriter.newLine();
         long startTime = System.currentTimeMillis();
