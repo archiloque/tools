@@ -16,11 +16,11 @@ import java.util.Map;
 
 public class App {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss.SSS");
 
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
-            throw new RuntimeException("We need one parameter for the problems lists");
+            throw new RuntimeException("We need one parameter for the problems lists file");
         }
         String fileName = args[0];
         System.out.println("Using problems from [" + fileName + "]");
@@ -51,7 +51,7 @@ public class App {
     private static void solveProblem(@NotNull String levelName,
                                      @NotNull MapState mapState,
                                      @NotNull BufferedWriter resultWriter) throws IOException {
-        System.out.println(DATE_FORMAT.format(new Date()) +" Calculating problem [" + levelName + "]");
+        printWithTimestamp("Calculating problem [" + levelName + "]");
         resultWriter.write(levelName);
         resultWriter.newLine();
         long startTime = System.nanoTime();
@@ -64,7 +64,7 @@ public class App {
             solution = nextCandidate.processState(states);
             if (solution) {
                 long stopTime = System.nanoTime();
-                System.out.println("Solved in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
+                printWithTimestamp("Solved in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
                 String[] solutionAsStringArray = nextCandidate.printableGrid();
                 for (String solutionLine : solutionAsStringArray) {
                     resultWriter.write(solutionLine);
@@ -74,10 +74,14 @@ public class App {
         }
         if (!solution) {
             long stopTime = System.nanoTime();
-            System.out.println("Failed to solve in "+ LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
+            printWithTimestamp("Failed to solve in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
         }
         resultWriter.newLine();
         resultWriter.flush();
+    }
+
+    private static void printWithTimestamp(String message) {
+        System.out.println(DATE_FORMAT.format(new Date()) + " " + message);
     }
 
 }
