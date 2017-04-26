@@ -20,7 +20,7 @@ final class MapState {
     /**
      * Path of the train leading to the current state.
      */
-    final @Nullable CoordinatesLinkedItem previousTrainPath;
+    private final @Nullable CoordinatesLinkedItem previousTrainPath;
 
     /**
      * Current Level.
@@ -30,7 +30,7 @@ final class MapState {
     /**
      * False = position is empty before executing the state.
      */
-    final @NotNull BitSet previousGrid;
+    private final @NotNull BitSet previousGrid;
 
     /**
      * Target of the current step step be ? -1 = we are exiting
@@ -71,7 +71,7 @@ final class MapState {
     /**
      * Coordinates of the exit.
      */
-    int exitCoordinates;
+    private int exitCoordinates;
 
     MapState(
             @NotNull Level level,
