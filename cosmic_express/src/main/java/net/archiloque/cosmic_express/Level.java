@@ -107,7 +107,8 @@ final class Level {
             trainElements[trainElementIndex] = new TrainElement(
                     TrainElementStatus.WAITING,
                     TrainElementContent.NO_CONTENT,
-                    -1
+                    -1,
+                    false
             );
         }
 

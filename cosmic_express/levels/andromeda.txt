@@ -1,10 +1,13 @@
 # I : Entry
 # Q : Exit
 # O : Obstacle
-# A : Monster 1 (purple) in
-# a : Monster 1 out
-# B : Monster 2 (orange) in
-# b : Monster 2 out
+# A : Monster purple in
+# a : Monster purple out
+# B : Monster orange in
+# b : Monster orange out
+# c : Red out which accept any monster
+# D : Monster green in
+# d : Monster green out
 
 [Level 01]
 train_size = 2

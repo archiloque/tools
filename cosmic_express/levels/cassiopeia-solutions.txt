@@ -18,3 +18,63 @@ X↑Ob↓←←bO↓↑
 B→↑↓←←←↑←←A
 B↑←←X⇨→→→↑A
 
+Level 03
+XXXOXQXOXXX
+XX→↓a↑aXXXX
+→→↑↓X↑←←XXX
+↑↓←←OXO↑←←←
+↑↓→→→→→→→↓↑
+↑→↑ObXbOX→↑
+↑BXXOXOXXAX
+↑B↓←←←←←←AX
+↑←←XX⇨→→↑XX
+
+Level 04
+XXXXXOQO↓←←←X
+XXXXXa↑a→→↓↑←
+→→→→↓X↑←↓←←X↑
+↑←Bb↓XA↑↓bB→↑
+→↑Bb→↓A↑←bB↑←
+↑XXXX→→→→→→→↑
+↑←←←←←←←←←←←←
+XXXXXXXXXXXX↑
+XXXXXX⇨→→→→→↑
+
+Level 05
+XXXXXXX⇨→↓X
+XXXXXXXXX↓A
+XXXOO↓←←←←A
+↓←←←←←XXXbX
+↓aaBBaaX→→Q
+↓→→→→→→→↑bX
+↓↑←OO↓←←←←A
+→↓↑←←←XXX↑A
+X→→→→→→→→↑X
+
+Level 06
+↓←←⇦XXXXXX
+→→↓X→→→→↓X
+b↓←X↑↓←←←b
+X↓BB↑↓BB→Q
+b→→→↑↓X→↑b
+↓←←←←←X↑←←
+→→→→→→→→→↑
+
+Level 07
+XXX↓←←←⇦XXX
+b↓←←→→→→→↓X
+↓←AB↑a↓←←←a
+↓→→→↑X↓AB→Q
+→↑ABXa→→↓↑b
+b↓←←←←←←←↑←
+X→→→→→→→→→↑
+
+Level 08
+XX⇨→→→→→→↓X
+XXXXXXX↓←←O
+Xb↓←←←←←XaX
+↓←←AAXBB→→Q
+↓bXX→→→→↑aX
+→→→↓↑←←←←←O
+XXX→→→→→→↑X
+

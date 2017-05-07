@@ -1,0 +1,54 @@
+Level 01
+→→→→→QXXXXX
+↑XX↓←←←XXXX
+↑←D↓XA↑←D↓←
+⇩↑←←→→↓↑←←↑
+→↓dX↑a→↓dX↑
+X→→→↑XX→→→↑
+XXXXXXXXXXX
+
+Level 02
+↓←←←←dXXXXX
+QX→→↑XXXXXX
+→→↑↓←←←←←XX
+↑XB→→→↓b↑←←
+↑←a↓←←←AXX↑
+X↑B→→→↓b→→↑
+→↑XX↓←←→↑XX
+↑XXX↓XX↑←←⇦
+↑←←←←DXXXXX
+
+Level 06 0
+X↓←←←←←←X
+d↓XXXX→↑X
+d→↓DBD↑←b
+X↓←X→→→↑X
+Q↓XX↑←←←Q
+↑←→→→→↓↑X
+d→↑DBD→↑b
+d↑←←←←XXX
+XXXX⇨↑XXX
+
+Level 06 1
+X→→→→→→→↓
+d↑←XXX↓←←
+d→↑DBD→↓b
+X↑←←←←X→↓
+QXXXX↑←←Q
+X→→→→→↓↑X
+d↑←DBD→↑b
+d→↑↓←←XXX
+X↑←←⇨↑XXX
+
+Level 07
+↓←←←←←←X
+↓bX→↓d↑X
+→→→↑↓X↑⇩
+XD↓←←B↑↓
+↓←←→→→↑↓
+↓XX↑↓←←←
+↓DX↑↓BXX
+↓X→↑↓XXQ
+↓b↑←←dX↑
+→→→→→→→↑
+

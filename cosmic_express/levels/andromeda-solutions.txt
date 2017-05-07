@@ -1,15 +1,15 @@
 Level 01
 XXXXXXXX
 XXXXXXXX
-XAXXXX→↓
-⇨→→→→→↑Q
+XAXXXXXX
+⇨→→→→→→Q
 XXXXXXaX
 XXXXXXXX
 XXXXXXXX
 
 Level 02
-→→→→→→↓X
-↑XAXXX→↓
+→→→→→→→↓
+↑XAXXXX↓
 ↑←←←←←a↓
 ⇨→→→↓↑XQ
 XXXX↓↑aX
@@ -78,4 +78,45 @@ Q↑↓XX↑X↓
 ↑←←ab↓↑←
 ⇨↓↑XX↓X↑
 X→↑BA→→↑
+
+Level 09
+XXX→→→→→→→↓
+XXX↑←←←←XXQ
+→↓BXaXb↑XXX
+↑→→→→→→↑AXX
+↑←A↓←a↓←←←←
+X↑X↓↑←←XAX↑
+→↑B↓aXb→→→↑
+↑XX→→→↓↑←←⇦
+↑←←←←←←XXXX
+
+Level 10
+XXX↓←←←←X
+↓←←←XXX↑⇦
+↓XAAAAA→↓
+↓→↓→↓→↓↑↓
+↓↑↓↑↓↑↓↑↓
+↓↑→↑→↑→↑↓
+→↑aaaaa↓←
+XXXX↓←←←Q
+XXXX→→→→↑
+
+Level 11
+→→→→↓→→→→↓
+↑X↓←←↑←←X↓
+↑←↓AaaA↑←↓
+⇩↑→→→→→↓↑Q
+↓↑←AaaA↓↑←
+→→↑X↓←←←X↑
+XXXX→→→→→↑
+
+Level 12
+XXXBbXXX
+→→→→→→↓X
+↑XXaAX↓Q
+↑←↓←←←↓↑
+X↑↓aA↑↓↑
+⇨↑↓→→↑↓↑
+XX↓↑←←←↑
+XX→→→→→↑
 

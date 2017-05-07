@@ -7,30 +7,56 @@ import java.util.Map;
 
 class LevelParser {
 
+    private static final char ENTRY_CHAR = 'I';
+    private static final char EXIT_CHAR = 'Q';
+    private static final char EMPTY_CHAR = 'X';
+    private static final char OBSTACLE_CHAR = 'O';
+    private static final char RAIL_CHAR = 'R';
+
+    private static final char MONSTER_PURPLE_IN_FILLED_CHAR = 'A';
+    private static final char MONSTER_PURPLE_OUT_EMPTY_CHAR = 'a';
+    private static final char MONSTER_ORANGE_IN_FILLED_CHAR = 'B';
+    private static final char MONSTER_ORANGE_OUT_EMPTY_CHAR = 'b';
+    private static final char MONSTER_RED_OUT_EMPTY_CHAR = 'c';
+    private static final char MONSTER_GREEN_IN_FILLED_CHAR = 'D';
+    private static final char MONSTER_GREEN_OUT_EMPTY_CHAR = 'd';
+
     final @NotNull Map<Byte, Character> elementsToChars = new HashMap<>();
-    final @NotNull Map<Character, Byte> charsToElements = new HashMap<>();
+    private final @NotNull Map<Character, Byte> charsToElements = new HashMap<>();
 
     LevelParser() {
-        elementsToChars.put(MapElement.ENTRY_INDEX, 'I');
-        elementsToChars.put(MapElement.EXIT_INDEX, 'Q');
-        elementsToChars.put(MapElement.EMPTY_INDEX, 'X');
-        elementsToChars.put(MapElement.OBSTACLE_INDEX, 'O');
+        elementsToChars.put(MapElement.ENTRY_INDEX, ENTRY_CHAR);
+        elementsToChars.put(MapElement.EXIT_INDEX, EXIT_CHAR);
+        elementsToChars.put(MapElement.EMPTY_INDEX, EMPTY_CHAR);
+        elementsToChars.put(MapElement.OBSTACLE_INDEX, OBSTACLE_CHAR);
+        elementsToChars.put(MapElement.RAIL_INDEX, RAIL_CHAR);
 
-        elementsToChars.put(MapElement.MONSTER_1_IN_FILLED_INDEX, 'A');
-        elementsToChars.put(MapElement.MONSTER_1_OUT_EMPTY_INDEX, 'a');
-        elementsToChars.put(MapElement.MONSTER_2_IN_FILLED_INDEX, 'B');
-        elementsToChars.put(MapElement.MONSTER_2_OUT_EMPTY_INDEX, 'b');
-        elementsToChars.put(MapElement.RAIL_INDEX, 'R');
+        elementsToChars.put(MapElement.MONSTER_PURPLE_IN_FILLED_INDEX, MONSTER_PURPLE_IN_FILLED_CHAR);
+        elementsToChars.put(MapElement.MONSTER_PURPLE_OUT_EMPTY_INDEX, MONSTER_PURPLE_OUT_EMPTY_CHAR);
 
-        charsToElements.put('I', MapElement.ENTRY_INDEX);
-        charsToElements.put('Q', MapElement.EXIT_INDEX);
-        charsToElements.put('X', MapElement.EMPTY_INDEX);
-        charsToElements.put('O', MapElement.OBSTACLE_INDEX);
+        elementsToChars.put(MapElement.MONSTER_ORANGE_IN_FILLED_INDEX, MONSTER_ORANGE_IN_FILLED_CHAR);
+        elementsToChars.put(MapElement.MONSTER_ORANGE_OUT_EMPTY_INDEX, MONSTER_ORANGE_OUT_EMPTY_CHAR);
 
-        charsToElements.put('A', MapElement.MONSTER_1_IN_FILLED_INDEX);
-        charsToElements.put('a', MapElement.MONSTER_1_OUT_EMPTY_INDEX);
-        charsToElements.put('B', MapElement.MONSTER_2_IN_FILLED_INDEX);
-        charsToElements.put('b', MapElement.MONSTER_2_OUT_EMPTY_INDEX);
+        elementsToChars.put(MapElement.MONSTER_RED_OUT_EMPTY_INDEX, MONSTER_RED_OUT_EMPTY_CHAR);
+
+        elementsToChars.put(MapElement.MONSTER_GREEN_IN_FILLED_INDEX, MONSTER_GREEN_IN_FILLED_CHAR);
+        elementsToChars.put(MapElement.MONSTER_GREEN_OUT_EMPTY_INDEX, MONSTER_GREEN_OUT_EMPTY_CHAR);
+
+        charsToElements.put(ENTRY_CHAR, MapElement.ENTRY_INDEX);
+        charsToElements.put(EXIT_CHAR, MapElement.EXIT_INDEX);
+        charsToElements.put(EMPTY_CHAR, MapElement.EMPTY_INDEX);
+        charsToElements.put(OBSTACLE_CHAR, MapElement.OBSTACLE_INDEX);
+
+        charsToElements.put(MONSTER_PURPLE_IN_FILLED_CHAR, MapElement.MONSTER_PURPLE_IN_FILLED_INDEX);
+        charsToElements.put(MONSTER_PURPLE_OUT_EMPTY_CHAR, MapElement.MONSTER_PURPLE_OUT_EMPTY_INDEX);
+
+        charsToElements.put(MONSTER_ORANGE_IN_FILLED_CHAR, MapElement.MONSTER_ORANGE_IN_FILLED_INDEX);
+        charsToElements.put(MONSTER_ORANGE_OUT_EMPTY_CHAR, MapElement.MONSTER_ORANGE_OUT_EMPTY_INDEX);
+
+        charsToElements.put(MONSTER_RED_OUT_EMPTY_CHAR, MapElement.MONSTER_RED_OUT_EMPTY_INDEX);
+
+        charsToElements.put(MONSTER_GREEN_IN_FILLED_CHAR, MapElement.MONSTER_GREEN_IN_FILLED_INDEX);
+        charsToElements.put(MONSTER_GREEN_OUT_EMPTY_CHAR, MapElement.MONSTER_GREEN_OUT_EMPTY_INDEX);
     }
 
     @NotNull Level readLevel(@NotNull String[] content, int trainSize) {

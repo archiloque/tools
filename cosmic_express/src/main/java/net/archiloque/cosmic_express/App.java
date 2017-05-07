@@ -22,7 +22,8 @@ public class App {
         if (args.length != 1) {
             throw new RuntimeException("We need one parameter for the problems lists file");
         }
-        String fileName = args[0];
+        String problemsSet = args[0];
+        String fileName =  "levels/" + problemsSet + ".txt";
         System.out.println("Using problems from [" + fileName + "]");
         Path problemsFile = Paths.get(fileName);
         if (!Files.exists(problemsFile)) {
@@ -38,20 +39,21 @@ public class App {
                 Level level = stringLevelMap.get(levelName);
                 List<MapState> mapStates = level.createMapStates();
                 if (mapStates.size() == 1) {
-                    solveProblem(levelName, mapStates.get(0), resultWriter);
+                    solveProblem(problemsSet, levelName, mapStates.get(0), resultWriter);
                 } else {
                     for (int problemIndex = 0; problemIndex < mapStates.size(); problemIndex++) {
-                        solveProblem(levelName + " " + problemIndex, mapStates.get(problemIndex), resultWriter);
+                        solveProblem(problemsSet, levelName + " " + problemIndex, mapStates.get(problemIndex), resultWriter);
                     }
                 }
             }
         }
     }
 
-    private static void solveProblem(@NotNull String levelName,
+    private static void solveProblem(@NotNull String problemsSet,
+                                     @NotNull String levelName,
                                      @NotNull MapState mapState,
                                      @NotNull BufferedWriter resultWriter) throws IOException {
-        printWithTimestamp("Calculating problem [" + levelName + "]");
+        printWithTimestamp(problemsSet, "[" + levelName + "] Calculating problem");
         resultWriter.write(levelName);
         resultWriter.newLine();
         long startTime = System.nanoTime();
@@ -64,7 +66,7 @@ public class App {
             solution = nextCandidate.processState(states);
             if (solution) {
                 long stopTime = System.nanoTime();
-                printWithTimestamp("Solved in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
+                printWithTimestamp(problemsSet, "[" + levelName + "] Solved in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
                 String[] solutionAsStringArray = nextCandidate.printableGrid();
                 for (String solutionLine : solutionAsStringArray) {
                     resultWriter.write(solutionLine);
@@ -74,14 +76,16 @@ public class App {
         }
         if (!solution) {
             long stopTime = System.nanoTime();
-            printWithTimestamp("Failed to solve in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
+            printWithTimestamp(problemsSet, "[" + levelName + "] Failed to solve in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
+            resultWriter.write("FAILED");
+            resultWriter.newLine();
         }
         resultWriter.newLine();
         resultWriter.flush();
     }
 
-    private static void printWithTimestamp(String message) {
-        System.out.println(DATE_FORMAT.format(new Date()) + " " + message);
+    private static void printWithTimestamp(@NotNull String problemsSet, @NotNull String message) {
+        System.out.println(problemsSet + " " + DATE_FORMAT.format(new Date()) + " " + message);
     }
 
 }

@@ -11,11 +11,15 @@ class TrainElement {
 
     final int coordinates;
 
+    final boolean taintedByGreenMonster;
+
     TrainElement(byte trainElementStatus,
                  byte content,
-                 int coordinates) {
+                 int coordinates,
+                 boolean taintedByGreenMonster) {
         this.trainElementStatus = trainElementStatus;
         this.content = content;
         this.coordinates = coordinates;
+        this.taintedByGreenMonster = taintedByGreenMonster;
     }
 }

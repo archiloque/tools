@@ -1,10 +1,13 @@
 # I : Entry
 # Q : Exit
 # O : Obstacle
-# A : Monster 1 (purple) in
-# a : Monster 1 out
-# B : Monster 2 (orange) in
-# b : Monster 2 out
+# A : Monster purple in
+# a : Monster purple out
+# B : Monster orange in
+# b : Monster orange out
+# c : Red out which accept any monster
+# D : Monster green in
+# d : Monster green out
 
 [Level 01]
 train_size = 2
@@ -39,3 +42,57 @@ XXXObXbOXXX
 XBXXOXOXXAX
 XBXXXXXXXAX
 XXXXXIXXXXX
+
+[Level 04]
+train_size = 3
+XXXXXOQOXXXXX
+XXXXXaXaXXXXX
+XXXXXXXXXXXXX
+XXBbXXAXXbBXX
+XXBbXXAXXbBXX
+XXXXXXXXXXXXX
+XXXXXXXXXXXXX
+XXXXXXXXXXXXX
+XXXXXXIXXXXXX
+
+[Level 05]
+train_size = 3
+XXXXXXXIXXX
+XXXXXXXXXXA
+XXXOOXXXXXA
+XXXXXXXXXbX
+XaaBBaaXXXQ
+XXXXXXXXXbX
+XXXOOXXXXXA
+XXXXXXXXXXA
+XXXXXXXXXXX
+
+[Level 06]
+train_size = 3
+XXXIXXXXXX
+XXXXXXXXXX
+bXXXXXXXXb
+XXBBXXBBXQ
+bXXXXXXXXb
+XXXXXXXXXX
+XXXXXXXXXX
+
+[Level 07]
+train_size = 3
+XXXXXXXIXXX
+bXXXXXXXXXX
+XXABXaXXXXa
+XXXXXXXABXQ
+XXABXaXXXXb
+bXXXXXXXXXX
+XXXXXXXXXXX
+
+[Level 08]
+train_size = 3
+XXIXXXXXXXX
+XXXXXXXXXXO
+XbXXXXXXXaX
+XXXAAXBBXXQ
+XbXXXXXXXaX
+XXXXXXXXXXO
+XXXXXXXXXXX

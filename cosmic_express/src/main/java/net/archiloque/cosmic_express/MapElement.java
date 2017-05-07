@@ -2,21 +2,32 @@ package net.archiloque.cosmic_express;
 
 final class MapElement {
 
-    private final static int NUMBER_OF_ELEMENTS = 13;
 
-    final static byte EMPTY_INDEX = 0;
-    final static byte MONSTER_1_IN_FILLED_INDEX = 1;
-    final static byte MONSTER_1_IN_EMPTY_INDEX = 2;
-    final static byte MONSTER_2_IN_FILLED_INDEX = 3;
-    final static byte MONSTER_2_IN_EMPTY_INDEX = 4;
-    final static byte MONSTER_1_OUT_FILLED_INDEX = 5;
-    final static byte MONSTER_1_OUT_EMPTY_INDEX = 6;
-    final static byte MONSTER_2_OUT_FILLED_INDEX = 7;
-    final static byte MONSTER_2_OUT_EMPTY_INDEX = 8;
-    final static byte OBSTACLE_INDEX = 9;
-    final static byte RAIL_INDEX = 10;
-    final static byte ENTRY_INDEX = 11;
-    final static byte EXIT_INDEX = 12;
+    final static byte EMPTY_INDEX = (byte) 0;
+    final static byte OBSTACLE_INDEX = EMPTY_INDEX + 1;
+    final static byte RAIL_INDEX = OBSTACLE_INDEX + 1;
+    final static byte ENTRY_INDEX = RAIL_INDEX + 1;
+    final static byte EXIT_INDEX = ENTRY_INDEX + 1;
+
+    final static byte MONSTER_PURPLE_IN_FILLED_INDEX = EXIT_INDEX + 1;
+    final static byte MONSTER_PURPLE_IN_EMPTY_INDEX = MONSTER_PURPLE_IN_FILLED_INDEX + 1;
+    final static byte MONSTER_PURPLE_OUT_FILLED_INDEX = MONSTER_PURPLE_IN_EMPTY_INDEX + 1;
+    final static byte MONSTER_PURPLE_OUT_EMPTY_INDEX = MONSTER_PURPLE_OUT_FILLED_INDEX + 1;
+
+    final static byte MONSTER_ORANGE_IN_FILLED_INDEX = MONSTER_PURPLE_OUT_EMPTY_INDEX + 1;
+    final static byte MONSTER_ORANGE_IN_EMPTY_INDEX = MONSTER_ORANGE_IN_FILLED_INDEX + 1;
+    final static byte MONSTER_ORANGE_OUT_FILLED_INDEX = MONSTER_ORANGE_IN_EMPTY_INDEX + 1;
+    final static byte MONSTER_ORANGE_OUT_EMPTY_INDEX = MONSTER_ORANGE_OUT_FILLED_INDEX + 1;
+    
+    final static byte MONSTER_RED_OUT_EMPTY_INDEX = MONSTER_ORANGE_OUT_EMPTY_INDEX + 1;
+    final static byte MONSTER_RED_OUT_FILLED_INDEX = MONSTER_RED_OUT_EMPTY_INDEX + 1;
+
+    final static byte MONSTER_GREEN_IN_FILLED_INDEX = MONSTER_RED_OUT_EMPTY_INDEX + 1;
+    final static byte MONSTER_GREEN_IN_EMPTY_INDEX = MONSTER_GREEN_IN_FILLED_INDEX + 1;
+    final static byte MONSTER_GREEN_OUT_FILLED_INDEX = MONSTER_GREEN_IN_EMPTY_INDEX + 1;
+    final static byte MONSTER_GREEN_OUT_EMPTY_INDEX = MONSTER_GREEN_OUT_FILLED_INDEX + 1;
+    
+    private final static int NUMBER_OF_ELEMENTS = MONSTER_GREEN_OUT_EMPTY_INDEX + 1;
 
     final static boolean[] MONSTER_IN_FILLED = new boolean[NUMBER_OF_ELEMENTS];
     final static boolean[] MONSTER_OUT_EMPTY = new boolean[NUMBER_OF_ELEMENTS];
@@ -36,51 +47,28 @@ final class MapElement {
 
     static {
         setValues(EMPTY_INDEX, false, false, true, TrainElementContent.NO_CONTENT);
-        setValues(MONSTER_1_IN_FILLED_INDEX, true, false, false, TrainElementContent.MONSTER_1);
-        setValues(MONSTER_1_IN_EMPTY_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
-        setValues(MONSTER_2_IN_FILLED_INDEX, true, false, false, TrainElementContent.MONSTER_2);
-        setValues(MONSTER_2_IN_EMPTY_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
-        setValues(MONSTER_1_OUT_FILLED_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
-        setValues(MONSTER_1_OUT_EMPTY_INDEX, false, true, false, TrainElementContent.NO_CONTENT);
-        setValues(MONSTER_2_OUT_FILLED_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
-        setValues(MONSTER_2_OUT_EMPTY_INDEX, false, true, false, TrainElementContent.NO_CONTENT);
         setValues(OBSTACLE_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
         setValues(RAIL_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
         setValues(ENTRY_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
         setValues(EXIT_INDEX, false, false, true, TrainElementContent.NO_CONTENT);
 
+        setValues(MONSTER_PURPLE_IN_FILLED_INDEX, true, false, false, TrainElementContent.MONSTER_PURPLE);
+        setValues(MONSTER_PURPLE_IN_EMPTY_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
+        setValues(MONSTER_PURPLE_OUT_FILLED_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
+        setValues(MONSTER_PURPLE_OUT_EMPTY_INDEX, false, true, false, TrainElementContent.NO_CONTENT);
+
+        setValues(MONSTER_ORANGE_IN_FILLED_INDEX, true, false, false, TrainElementContent.MONSTER_ORANGE);
+        setValues(MONSTER_ORANGE_IN_EMPTY_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
+        setValues(MONSTER_ORANGE_OUT_FILLED_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
+        setValues(MONSTER_ORANGE_OUT_EMPTY_INDEX, false, true, false, TrainElementContent.NO_CONTENT);
+
+        setValues(MONSTER_RED_OUT_FILLED_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
+        setValues(MONSTER_RED_OUT_EMPTY_INDEX, false, true, false, TrainElementContent.NO_CONTENT);
+
+        setValues(MONSTER_GREEN_IN_FILLED_INDEX, true, false, false, TrainElementContent.MONSTER_GREEN);
+        setValues(MONSTER_GREEN_IN_EMPTY_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
+        setValues(MONSTER_GREEN_OUT_FILLED_INDEX, false, false, false, TrainElementContent.NO_CONTENT);
+        setValues(MONSTER_GREEN_OUT_EMPTY_INDEX, false, true, false, TrainElementContent.NO_CONTENT);
     }
 
-    static byte outBoardEmptyElement(byte trainElementContent) {
-        switch (trainElementContent) {
-            case TrainElementContent.MONSTER_1:
-                return MONSTER_1_OUT_EMPTY_INDEX;
-            case TrainElementContent.MONSTER_2:
-                return MONSTER_2_OUT_EMPTY_INDEX;
-            default:
-                throw new RuntimeException("Unknown content [" + trainElementContent + "]");
-        }
-    }
-
-    static byte outBoardFilledElement(byte trainElementContent) {
-        switch (trainElementContent) {
-            case TrainElementContent.MONSTER_1:
-                return MONSTER_1_OUT_FILLED_INDEX;
-            case TrainElementContent.MONSTER_2:
-                return MONSTER_2_OUT_FILLED_INDEX;
-            default:
-                throw new RuntimeException("Unknown content [" + trainElementContent + "]");
-        }
-    }
-
-    static byte inBoardEmptyElement(byte trainElementContent) {
-        switch (trainElementContent) {
-            case TrainElementContent.MONSTER_1:
-                return MONSTER_1_IN_EMPTY_INDEX;
-            case TrainElementContent.MONSTER_2:
-                return MONSTER_2_IN_EMPTY_INDEX;
-            default:
-                throw new RuntimeException("Unknown content [" + trainElementContent + "]");
-        }
-    }
 }

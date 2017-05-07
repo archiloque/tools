@@ -1,7 +1,7 @@
 Level 01
-XXXO→↓b
-→→→→↑↓X
-↑←←A↓←X
+XXXOXXb
+→→→→→→↓
+↑←←A↓←←
 ⇨↓↑X↓OQ
 X→↑B→↓↑
 XXXXX→↑
