@@ -15,37 +15,37 @@ public class LevelDebugger {
                 "QXXXXXXXXX\n" +
                 "XXaXXcXXXB\n" +
                 "XXXXXXXXXB").split("\n"), 3);
-        int[][] solutionPath = new int[][]{
-                new int[]{0,7},
-                new int[]{0,8},
-                new int[]{1,8},
-                new int[]{1,7},
-                new int[]{1,6},
-                new int[]{0,6},
-                new int[]{0,5},
-                new int[]{0,4},
-                new int[]{0,3},
-                new int[]{1,3},
-                new int[]{2,3},
-                new int[]{3,3},
-                new int[]{3,4},
-                new int[]{2,4},
-                new int[]{2,5},
-                new int[]{2,6},
-                new int[]{2,7},
-                new int[]{2,8},
-                new int[]{3,8},
-                new int[]{3,7},
-                new int[]{3,6},
-                new int[]{3,5},
-                new int[]{3,4},
-                new int[]{3,3},
-                new int[]{3,2},
-                new int[]{3,1},
-                new int[]{2,1},
-                new int[]{1,1},
-                new int[]{1,0},
-                new int[]{2,0}
+        Coordinates[] solutionPath = new Coordinates[]{
+                new Coordinates(0,7),
+                new Coordinates(0,8),
+                new Coordinates(1,8),
+                new Coordinates(1,7),
+                new Coordinates(1,6),
+                new Coordinates(0,6),
+                new Coordinates(0,5),
+                new Coordinates(0,4),
+                new Coordinates(0,3),
+                new Coordinates(1,3),
+                new Coordinates(2,3),
+                new Coordinates(3,3),
+                new Coordinates(3,4),
+                new Coordinates(2,4),
+                new Coordinates(2,5),
+                new Coordinates(2,6),
+                new Coordinates(2,7),
+                new Coordinates(2,8),
+                new Coordinates(3,8),
+                new Coordinates(3,7),
+                new Coordinates(3,6),
+                new Coordinates(3,5),
+                new Coordinates(3,4),
+                new Coordinates(3,3),
+                new Coordinates(3,2),
+                new Coordinates(3,1),
+                new Coordinates(2,1),
+                new Coordinates(1,1),
+                new Coordinates(1,0),
+                new Coordinates(2,0)
         };
         int currentSolutionIndex = solutionPath.length;
         while ((currentSolutionIndex > 0) && (! MapState.FOUND_TRAIN_PATH)) {
@@ -55,11 +55,11 @@ public class LevelDebugger {
                 throw new RuntimeException("Several map states, error !");
             }
 
-            List<Integer> coordinatesList = new ArrayList<>(currentSolutionIndex);
+            List<Coordinates> coordinatesList = new ArrayList<>(currentSolutionIndex);
             for(int i = 0; i < currentSolutionIndex; i++) {
-                coordinatesList.add((solutionPath[i][0] << 16) + solutionPath[i][1]);
+                coordinatesList.add(solutionPath[i]);
             }
-            MapState.TRAIN_PATH_TO_CHECK = Level.listToPrimitiveIntArray(coordinatesList);
+            MapState.TRAIN_PATH_TO_CHECK = coordinatesList.toArray(new Coordinates[coordinatesList.size()]);
 
             LinkedList<MapState> states = new LinkedList<>();
             states.add(mapStates.get(0));

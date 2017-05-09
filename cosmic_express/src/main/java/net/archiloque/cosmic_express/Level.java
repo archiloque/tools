@@ -37,16 +37,18 @@ final class Level {
     int[] monsterOuts;
 
     /**
-     * Coordinates of the monsters ins near each position indexed by which monsters ins are not empty.
+     * Coordinates of the monsters in near each position indexed by which monsters ins are not empty.
      */
-    int[][][] monsterInsGrids;
+    int[][] monsterInsGrids;
 
     /**
      * Coordinates of the monsters outs near each position indexed by which monsters outs are not empty.
      */
     int[][][] monsterOutsGrids;
 
-    int entry;
+    int entryLine;
+
+    int entryColumn;
 
     Level(int trainSize, int height, int width) {
         this.trainSize = trainSize;
@@ -60,7 +62,8 @@ final class Level {
     void setElement(byte mapElement, Coordinates coordinates) {
         grid[(coordinates.line * width) + coordinates.column] = mapElement;
         if (mapElement == MapElement.ENTRY_INDEX) {
-            entry = (coordinates.line << 16) + coordinates.column;
+            entryLine = coordinates.line;
+            entryColumn = coordinates.column;
         }
     }
 
@@ -79,9 +82,9 @@ final class Level {
                 int mapElement = grid[(lineIndex * width) + columnIndex];
                 if (MapElement.MONSTER_IN_FILLED[mapElement]) {
                     numberOfMonsters += 1;
-                    monstersInsList.add(lineIndex * width + columnIndex);
+                    monstersInsList.add((lineIndex * width) + columnIndex);
                 } else if (MapElement.MONSTER_OUT_EMPTY[mapElement]) {
-                    monstersOutsList.add(lineIndex * width + columnIndex);
+                    monstersOutsList.add((lineIndex * width) + columnIndex);
                 } else if (mapElement == MapElement.EXIT_INDEX) {
                     exitCoordinates.add(new Coordinates(lineIndex, columnIndex));
                 }
@@ -90,23 +93,23 @@ final class Level {
 
         monsterIns = listToPrimitiveIntArray(monstersInsList);
         int monstersInsPossibilities = 1 << monsterIns.length;
-        monsterInsGrids = new int[monstersInsPossibilities][][];
+        monsterInsGrids = new int[monstersInsPossibilities][];
         for (int i = 0; i < monstersInsPossibilities; i++) {
-            monsterInsGrids[i] = calculateMonsterGrid(i, monsterIns);
+            monsterInsGrids[i] = calculateMonsterInGrid(i, monsterIns);
         }
 
         monsterOuts = listToPrimitiveIntArray(monstersOutsList);
         int monstersOutsPossibilities = 1 << monsterOuts.length;
         monsterOutsGrids = new int[monstersOutsPossibilities][][];
         for (int i = 0; i < monstersOutsPossibilities; i++) {
-            monsterOutsGrids[i] = calculateMonsterGrid(i, monsterOuts);
+            monsterOutsGrids[i] = calculateMonsterOutGrid(i, monsterOuts);
         }
 
         TrainElement[] trainElements = new TrainElement[trainSize];
         for (int trainElementIndex = 0; trainElementIndex < trainSize; trainElementIndex++) {
             trainElements[trainElementIndex] = new TrainElement(
-                    TrainElementStatus.WAITING,
                     TrainElementContent.NO_CONTENT,
+                    -1,
                     -1,
                     false
             );
@@ -136,9 +139,11 @@ final class Level {
                             previousGridCurrentSegment,
                             numberOfMonsters,
                             -1,
+                            -1,
                             trainElements,
                             null,
-                            (currentExit.line << 16) + currentExit.column,
+                            currentExit.line,
+                            currentExit.column,
                             monstersInsPossibilities - 1,
                             monsterInsGrids[monstersInsPossibilities - 1],
                             monstersOutsPossibilities - 1,
@@ -146,17 +151,6 @@ final class Level {
                     )
             );
 
-        }
-        return result;
-    }
-
-    /**
-     * Convert a list to a primitive int array.
-     */
-    static @NotNull int[] listToPrimitiveIntArray(@NotNull List<Integer> list) {
-        int[] result = new int[list.size()];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = list.get(i);
         }
         return result;
     }
@@ -174,7 +168,39 @@ final class Level {
     /**
      * Calculate grid monsters.
      */
-    private @NotNull int[][] calculateMonsterGrid(int index, @NotNull int[] positions) {
+    private @NotNull int[][] calculateMonsterOutGrid(int index, @NotNull int[] positions) {
+        List<Integer>[] resultWithLists = calculateMonsterGrid(index, positions);
+        int[][] realResult = new int[width * height][];
+        for (int i = 0; i < realResult.length; i++) {
+            List<Integer> currentGrid = resultWithLists[i];
+            if (currentGrid != null) {
+                int[] currentGridPrimitive = listToPrimitiveIntArray(currentGrid);
+                Arrays.sort(currentGridPrimitive);
+                realResult[i] = currentGridPrimitive;
+            }
+
+        }
+        return realResult;
+    }
+
+    /**
+     * Calculate grid monsters.
+     */
+    private @NotNull int[] calculateMonsterInGrid(int index, @NotNull int[] positions) {
+        List<Integer>[] resultWithLists = calculateMonsterGrid(index, positions);
+        int[] realResult = new int[width * height];
+        for (int i = 0; i < realResult.length; i++) {
+            List<Integer> currentGrid = resultWithLists[i];
+            if ((currentGrid != null) && (currentGrid.size() == 1)) {
+                realResult[i] = currentGrid.get(0);
+            } else {
+                realResult[i] = -1;
+            }
+        }
+        return realResult;
+    }
+
+    private @NotNull List<Integer>[] calculateMonsterGrid(int index, @NotNull int[] positions) {
         List<Integer>[] resultWithLists = new List[width * height];
         for (int i = 0; i < positions.length; i++) {
             if ((index & (1 << i)) != 0) {
@@ -200,17 +226,18 @@ final class Level {
 
             }
         }
-        int[][] realResult = new int[width * height][];
-        for (int i = 0; i < realResult.length; i++) {
-            List<Integer> currentGrid = resultWithLists[i];
-            if (currentGrid != null) {
-                int[] currentGridPrimitive = listToPrimitiveIntArray(currentGrid);
-                Arrays.sort(currentGridPrimitive);
-                realResult[i] = currentGridPrimitive;
-            }
+        return resultWithLists;
+    }
 
+    /**
+     * Convert a list to a primitive int array.
+     */
+    static @NotNull int[] listToPrimitiveIntArray(@NotNull List<Integer> list) {
+        int[] result = new int[list.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = list.get(i);
         }
-        return realResult;
+        return result;
     }
 
 

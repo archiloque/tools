@@ -2,24 +2,30 @@ package net.archiloque.cosmic_express;
 
 class TrainElement {
 
-    final byte trainElementStatus;
-
     /**
      * A TrainElementContent
      */
     final byte content;
 
-    final int coordinates;
+    /**
+     * -1 : out of board
+     */
+    final int line;
+
+    /**
+     * -1 : out of board
+     */
+    final int column;
 
     final boolean taintedByGreenMonster;
 
-    TrainElement(byte trainElementStatus,
-                 byte content,
-                 int coordinates,
+    TrainElement(byte content,
+                 int line,
+                 int column,
                  boolean taintedByGreenMonster) {
-        this.trainElementStatus = trainElementStatus;
         this.content = content;
-        this.coordinates = coordinates;
+        this.line = line;
+        this.column = column;
         this.taintedByGreenMonster = taintedByGreenMonster;
     }
 }

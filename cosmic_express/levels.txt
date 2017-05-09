@@ -1,6 +1,0 @@
-java -jar target/cosmic_express-1.0-SNAPSHOT.jar andromeda
-java -jar target/cosmic_express-1.0-SNAPSHOT.jar cassiopeia
-java -jar target/cosmic_express-1.0-SNAPSHOT.jar delphinus
-java -jar target/cosmic_express-1.0-SNAPSHOT.jar taurus
-java -jar target/cosmic_express-1.0-SNAPSHOT.jar ursa-minor
-java -jar target/cosmic_express-1.0-SNAPSHOT.jar vela

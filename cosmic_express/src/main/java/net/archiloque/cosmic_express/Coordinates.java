@@ -10,4 +10,5 @@ class Coordinates {
         this.line = line;
         this.column = column;
     }
+
 }

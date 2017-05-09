@@ -23,7 +23,7 @@ public class App {
             throw new RuntimeException("We need one parameter for the problems lists file");
         }
         String problemsSet = args[0];
-        String fileName =  "levels/" + problemsSet + ".txt";
+        String fileName = "levels/" + problemsSet + ".txt";
         System.out.println("Using problems from [" + fileName + "]");
         Path problemsFile = Paths.get(fileName);
         if (!Files.exists(problemsFile)) {
@@ -36,6 +36,7 @@ public class App {
 
         try (BufferedWriter resultWriter = Files.newBufferedWriter(Paths.get(fileName.substring(0, fileName.length() - 4) + "-solutions.txt"))) {
             for (String levelName : levelNames) {
+                printWithTimestamp(problemsSet, "[" + levelName + "] Init level");
                 Level level = stringLevelMap.get(levelName);
                 List<MapState> mapStates = level.createMapStates();
                 if (mapStates.size() == 1) {

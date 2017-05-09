@@ -12,29 +12,32 @@ import java.util.List;
  */
 class CoordinatesLinkedItem {
 
-    final int element;
+    final int line;
 
-    final @Nullable CoordinatesLinkedItem previous;
+    final int column;
 
-    CoordinatesLinkedItem(int element, @Nullable CoordinatesLinkedItem previous) {
-        this.element = element;
+    private final @Nullable CoordinatesLinkedItem previous;
+
+    CoordinatesLinkedItem(int line, int column, @Nullable CoordinatesLinkedItem previous) {
+        this.line = line;
+        this.column = column;
         this.previous = previous;
     }
 
-    @NotNull List<Integer> getAsList(@NotNull Level level) {
-        List<Integer> trainPathList = new ArrayList<>();
+    @NotNull List<Coordinates> getAsList(@NotNull Level level) {
+        List<Coordinates> trainPathList = new ArrayList<>();
 
         CoordinatesLinkedItem trainPath = this;
         while (trainPath != null) {
-            trainPathList.add(trainPath.element);
+            trainPathList.add(new Coordinates(trainPath.line, trainPath.column));
             trainPath = trainPath.previous;
         }
-        trainPathList.add(level.entry);
+        trainPathList.add(new Coordinates(level.entryLine, level.entryColumn));
         Collections.reverse(trainPathList);
         return trainPathList;
     }
 
     public String toString() {
-        return element + " (" + (element >> 16) + ", " + (element & 65535) + ")";
+        return " (" + line + ", " + column + ")";
     }
 }

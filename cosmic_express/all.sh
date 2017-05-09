@@ -1,3 +1,3 @@
 mvn clean install -DskipTests
-parallel --jobs 3 --ungroup -v < levels.txt
+caffeinate -i parallel --shuf --jobs 3 --ungroup -v < levels.sh
 
