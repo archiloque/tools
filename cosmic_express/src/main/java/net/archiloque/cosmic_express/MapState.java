@@ -62,7 +62,16 @@ final class MapState {
 
     private final @NotNull BitSet previousGridSegment;
 
+    /**
+     * Segment : we loaded or unloaded a monster
+     * While we are on a segment we avoid turning around
+     */
     private boolean enteredNewSegment = false;
+
+    /**
+     *
+     */
+    private boolean isNearAMonsterInOrOut = false;
 
     private int newMissingNumberOfMonsters;
 
@@ -224,6 +233,11 @@ final class MapState {
             }
         } else if (trainElementIndex == 0) {
             // head element
+
+            int currentTargetLocalCoordinates = (currentStepTargetLine * level.width) + currentStepTargetColumn;
+            isNearAMonsterInOrOut = (monsterInsGrid[currentTargetLocalCoordinates] != -1) ||
+                    (monsterOutsGrid[currentTargetLocalCoordinates] != null);
+
             return new TrainElement(
                     TrainElementContent.NO_CONTENT,
                     currentStepTargetLine,
@@ -241,17 +255,25 @@ final class MapState {
         byte newTrainElementContent = previousTrainElement.content;
         boolean newTrainElementTaintedByGreenMonster = previousTrainElement.taintedByGreenMonster;
 
-        if (newTrainElementContent != TrainElementContent.NO_CONTENT) {
-            int[] monsterOuts = monsterOutsGrid[newTrainElementLocalCoordinates];
-            if (canEmpty(monsterOuts, newTrainElementContent)) {
-                newTrainElementContent = TrainElementContent.NO_CONTENT;
-                enteredNewSegment = true;
+        int[] monsterOuts = monsterOutsGrid[newTrainElementLocalCoordinates];
+        if (monsterOuts != null) {
+            if (trainElementIndex != (level.trainSize - 1)) {
+                isNearAMonsterInOrOut = true;
+            }
+            if (newTrainElementContent != TrainElementContent.NO_CONTENT) {
+                if (canEmpty(monsterOuts, newTrainElementContent)) {
+                    newTrainElementContent = TrainElementContent.NO_CONTENT;
+                    enteredNewSegment = true;
+                }
             }
         }
 
-        if (newTrainElementContent == TrainElementContent.NO_CONTENT) {
-            int monsterInCoordinates = monsterInsGrid[newTrainElementLocalCoordinates];
-            if (monsterInCoordinates != -1) {
+        int monsterInCoordinates = monsterInsGrid[newTrainElementLocalCoordinates];
+        if (monsterInCoordinates != -1) {
+            if (trainElementIndex != (level.trainSize - 1)) {
+                isNearAMonsterInOrOut = true;
+            }
+            if (newTrainElementContent == TrainElementContent.NO_CONTENT) {
                 int element = level.grid[monsterInCoordinates];
                 byte possibleNewTrainElementContent = MapElement.MONSTER[element];
                 if ((!newTrainElementTaintedByGreenMonster) || (possibleNewTrainElementContent == TrainElementContent.MONSTER_GREEN)) {
@@ -281,17 +303,15 @@ final class MapState {
      * @return true if it can be emptied
      */
     private boolean canEmpty(
-            @Nullable int[] monsterOuts,
+            @NotNull int[] monsterOuts,
             byte trainElementContent) {
-        if (monsterOuts != null) {
-            for (int monsterOutCoordinates : monsterOuts) {
-                int monsterOutElement = level.grid[monsterOutCoordinates];
-                if ((trainElementContent == monsterOutElement) || (monsterOutElement == MapElement.MONSTER_RED_OUT_EMPTY_INDEX)) {
-                    newMissingNumberOfMonsters--;
-                    monsterOutsIndex -= 1 << Arrays.binarySearch(level.monsterOuts, monsterOutCoordinates);
-                    monsterOutsGrid = level.monsterOutsGrids[monsterOutsIndex];
-                    return true;
-                }
+        for (int monsterOutCoordinates : monsterOuts) {
+            int monsterOutElement = level.grid[monsterOutCoordinates];
+            if ((trainElementContent == monsterOutElement) || (monsterOutElement == MapElement.MONSTER_RED_OUT_EMPTY_INDEX)) {
+                newMissingNumberOfMonsters--;
+                monsterOutsIndex -= 1 << Arrays.binarySearch(level.monsterOuts, monsterOutCoordinates);
+                monsterOutsGrid = level.monsterOutsGrids[monsterOutsIndex];
+                return true;
             }
         }
         return false;
@@ -325,24 +345,12 @@ final class MapState {
         boolean isFirstColumn = (currentColumn == 0);
         boolean isLastColumn = (currentColumn == (level.width - 1));
 
-        boolean isANewSegmentOrNearAMonsterInOrOut = enteredNewSegment;
-        for (int i = 0; (!isANewSegmentOrNearAMonsterInOrOut) && (i < level.trainSize - 1); i++) {
-            TrainElement currentTrainElement = trainElements[i];
-            int currentTrainElementLine = currentTrainElement.line;
-            if (currentTrainElementLine != -1) {
-                int currentTrainElementColumn = currentTrainElement.column;
-                int currentTrainElementLocalCoordinates = (currentTrainElementLine * level.width) + currentTrainElementColumn;
-                isANewSegmentOrNearAMonsterInOrOut =
-                        (monsterInsGrid[currentTrainElementLocalCoordinates] != -1) ||
-                                (monsterOutsGrid[currentTrainElementLocalCoordinates] != null);
-            }
-        }
         {
             // up
             int targetPositionUp = currentPosition - level.width;
             if ((!isFirstLine) &&
                     (!grid.get(targetPositionUp))) {
-                if (isANewSegmentOrNearAMonsterInOrOut ||
+                if (isNearAMonsterInOrOut ||
                         (
                                 ((currentLine == 1) || (!previousGridSegment.get(targetPositionUp - level.width))) && // up
                                         (isFirstColumn || (!previousGridSegment.get(targetPositionUp - 1)) && // left
@@ -358,7 +366,7 @@ final class MapState {
             int targetPositionDown = currentPosition + level.width;
             if ((!isLastLine) &&
                     (!grid.get(targetPositionDown))) {
-                if (isANewSegmentOrNearAMonsterInOrOut ||
+                if (isNearAMonsterInOrOut ||
                         (
                                 ((currentLine == (level.height - 2)) || (!previousGridSegment.get(targetPositionDown + level.width))) && // down
                                         (isFirstColumn || (!previousGridSegment.get(targetPositionDown - 1)) && // left
@@ -374,7 +382,7 @@ final class MapState {
             int targetPositionLeft = currentPosition - 1;
             if ((!isFirstColumn) &&
                     (!grid.get(targetPositionLeft))) {
-                if (isANewSegmentOrNearAMonsterInOrOut ||
+                if (isNearAMonsterInOrOut ||
                         (
                                 (isFirstLine || (!previousGridSegment.get(targetPositionLeft - level.width))) && // up
                                         (isLastLine || (!previousGridSegment.get(targetPositionLeft + level.width))) && // down
@@ -390,7 +398,7 @@ final class MapState {
             int targetPositionRight = currentPosition + 1;
             if ((!isLastColumn) &&
                     (!grid.get(targetPositionRight))) {
-                if (isANewSegmentOrNearAMonsterInOrOut ||
+                if (isNearAMonsterInOrOut ||
                         (
                                 (isFirstLine || (!previousGridSegment.get(targetPositionRight - level.width))) && // up
                                         (isLastLine || (!previousGridSegment.get(targetPositionRight + level.width))) && // down
