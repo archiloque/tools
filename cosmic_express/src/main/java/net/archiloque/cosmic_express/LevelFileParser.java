@@ -7,96 +7,32 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class LevelFileParser {
-
-    enum ReadingStatus {
-        HEADER,
-        LOOKING_FOR_TITLE,
-        LOOKING_FOR_TRAIN_SIZE,
-        LOOKING_FOR_CONTENT
-    }
 
     LevelFileParser() {
 
     }
 
-    @NotNull Map<String, Level> parseFile(Path levelFiles) throws IOException {
+    @NotNull Level parseFile(@NotNull Path levelFile) throws IOException {
         LevelParser levelParser = new LevelParser();
-        Map<String, Level> result = new HashMap<>();
-        try (BufferedReader reader = Files.newBufferedReader(levelFiles)) {
-            ReadingStatus currentStatus = ReadingStatus.HEADER;
-            String currentLine = reader.readLine();
-            String currentLevelName = null;
+        try (BufferedReader reader = Files.newBufferedReader(levelFile)) {
             int currentTrainSize = -1;
+            String currentLine = reader.readLine();
+            if (! currentLine.startsWith("train_size = ")) {
+                throw new RuntimeException("Unexpected line [" + currentLine + "]");
+            }
+            currentTrainSize = Integer.parseInt(currentLine.substring(13, currentLine.length()));
             List<String> currentContent = new ArrayList<>();
-
+            currentLine = reader.readLine();
             while (currentLine != null) {
-                if (currentStatus == ReadingStatus.HEADER) {
-                    if (currentLine.startsWith("#")) {
-                        currentLine = reader.readLine();
-                        continue;
-                    } else {
-                        currentStatus = ReadingStatus.LOOKING_FOR_TITLE;
-                    }
+                if(currentLine.length() != 0) {
+                    currentContent.add(currentLine);
                 }
-                if (currentStatus == ReadingStatus.LOOKING_FOR_CONTENT) {
-                    if (currentLine.length() == 0) {
-                        currentLine = reader.readLine();
-                        continue;
-                    } else if (currentLine.startsWith("[")) {
-                        result.put(
-                                currentLevelName,
-                                levelParser.readLevel(currentContent.toArray(new String[currentContent.size()]), currentTrainSize)
-                        );
-
-                        currentStatus = ReadingStatus.LOOKING_FOR_TITLE;
-                        currentContent = new ArrayList<>();
-                    } else {
-                        currentContent.add(currentLine);
-                        currentLine = reader.readLine();
-                        continue;
-                    }
-                }
-                if (currentStatus == ReadingStatus.LOOKING_FOR_TITLE) {
-                    if (currentLine.length() == 0) {
-                        currentLine = reader.readLine();
-                        continue;
-                    } else if (currentLine.startsWith("[") && currentLine.endsWith("]")) {
-                        currentLevelName = currentLine.substring(1, currentLine.length() - 1);
-                        currentStatus = ReadingStatus.LOOKING_FOR_TRAIN_SIZE;
-                        currentLine = reader.readLine();
-                        continue;
-                    } else {
-                        throw new RuntimeException("Unexpected line [" + currentLine + "]");
-                    }
-                }
-                if (currentStatus == ReadingStatus.LOOKING_FOR_TRAIN_SIZE) {
-                    if (currentLine.length() == 0) {
-                        currentLine = reader.readLine();
-                        continue;
-                    } else if (currentLine.startsWith("train_size = ")) {
-                        currentTrainSize = Integer.parseInt(currentLine.substring(13, currentLine.length()));
-                        currentStatus = ReadingStatus.LOOKING_FOR_CONTENT;
-                        currentLine = reader.readLine();
-                        continue;
-                    } else {
-                        throw new RuntimeException("Unexpected line [" + currentLine + "]");
-                    }
-                }
+                currentLine = reader.readLine();
             }
-            if (!currentContent.isEmpty()) {
-                result.put(
-                        currentLevelName,
-                        levelParser.readLevel(currentContent.toArray(new String[currentContent.size()]), currentTrainSize)
-                );
-            }
-
+            return levelParser.readLevel(currentContent.toArray(new String[currentContent.size()]), currentTrainSize);
         }
-
-        return result;
     }
 }

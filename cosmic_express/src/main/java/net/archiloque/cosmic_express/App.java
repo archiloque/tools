@@ -3,16 +3,20 @@ package net.archiloque.cosmic_express;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class App {
 
@@ -20,43 +24,61 @@ public class App {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
-            throw new RuntimeException("We need one parameter for the problems lists file");
+            throw new RuntimeException("We need one parameter for the problem(s) file(s)");
         }
-        String problemsSet = args[0];
-        String fileName = "levels/" + problemsSet + ".txt";
-        System.out.println("Using problems from [" + fileName + "]");
-        Path problemsFile = Paths.get(fileName);
-        if (!Files.exists(problemsFile)) {
-            System.out.println("Problem file doesn't exist [" + problemsFile.getFileName() + "]");
-        }
-        LevelFileParser levelFileParser = new LevelFileParser();
-        Map<String, Level> stringLevelMap = levelFileParser.parseFile(problemsFile);
-        String[] levelNames = stringLevelMap.keySet().toArray(new String[stringLevelMap.size()]);
-        Arrays.sort(levelNames);
 
-        try (BufferedWriter resultWriter = Files.newBufferedWriter(Paths.get(fileName.substring(0, fileName.length() - 4) + "-solutions.txt"))) {
-            for (String levelName : levelNames) {
-                printWithTimestamp(problemsSet, "[" + levelName + "] Init level");
-                Level level = stringLevelMap.get(levelName);
-                List<MapState> mapStates = level.createMapStates();
-                if (mapStates.size() == 1) {
-                    solveProblem(problemsSet, levelName, mapStates.get(0), resultWriter);
-                } else {
-                    for (int problemIndex = 0; problemIndex < mapStates.size(); problemIndex++) {
-                        solveProblem(problemsSet, levelName + " " + problemIndex, mapStates.get(problemIndex), resultWriter);
+        if (!new File("solutions").exists()) {
+            new File("solutions").mkdir();
+        }
+
+        String problemGlob = args[0];
+        PathMatcher matcher =
+                FileSystems.getDefault().getPathMatcher("glob:levels/" + problemGlob + "*.txt");
+
+        Files.walkFileTree(Paths.get("levels/"), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                if (matcher.matches(file)) {
+                    try {
+                        processFile(file);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+    }
+
+    private static void processFile(Path problemsFile) throws IOException {
+        String fileName = problemsFile.getFileName().toString();
+        System.out.println("Reading problem from [" + problemsFile.toAbsolutePath() + "]");
+        LevelFileParser levelFileParser = new LevelFileParser();
+        Level level = levelFileParser.parseFile(problemsFile);
+        String problemName = fileName.substring(0, fileName.length() - 4);
+        try (BufferedWriter resultWriter = Files.newBufferedWriter(Paths.get("solutions/" + problemName + ".txt"))) {
+            printWithTimestamp(fileName, "Init level");
+            List<MapState> mapStates = level.createMapStates();
+            if (mapStates.size() == 1) {
+                solveProblem(problemName, "", mapStates.get(0), resultWriter);
+            } else {
+                for (int problemIndex = 0; problemIndex < mapStates.size(); problemIndex++) {
+                    solveProblem(problemName, "" + problemIndex, mapStates.get(problemIndex), resultWriter);
                 }
             }
         }
     }
 
-    private static void solveProblem(@NotNull String problemsSet,
+    private static void solveProblem(@NotNull String problemName,
                                      @NotNull String levelName,
                                      @NotNull MapState mapState,
                                      @NotNull BufferedWriter resultWriter) throws IOException {
-        printWithTimestamp(problemsSet, "[" + levelName + "] Calculating problem");
-        resultWriter.write(levelName);
-        resultWriter.newLine();
+        printWithTimestamp(problemName, "[" + levelName + "] Calculating problem");
+        if (!levelName.isEmpty()) {
+            resultWriter.write(levelName);
+            resultWriter.newLine();
+        }
         long startTime = System.nanoTime();
 
         LinkedList<MapState> states = new LinkedList<>();
@@ -67,7 +89,7 @@ public class App {
             solution = nextCandidate.processState(states);
             if (solution) {
                 long stopTime = System.nanoTime();
-                printWithTimestamp(problemsSet, "[" + levelName + "] Solved in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
+                printWithTimestamp(problemName, levelName.isEmpty() ? "" : ("[" + levelName + "] ") + "Solved in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
                 String[] solutionAsStringArray = nextCandidate.printableGrid();
                 for (String solutionLine : solutionAsStringArray) {
                     resultWriter.write(solutionLine);
@@ -77,7 +99,7 @@ public class App {
         }
         if (!solution) {
             long stopTime = System.nanoTime();
-            printWithTimestamp(problemsSet, "[" + levelName + "] Failed to solve in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
+            printWithTimestamp(problemName, levelName.isEmpty() ? "" : ("[" + levelName + "] ") + "Failed to solve in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
             resultWriter.write("FAILED");
             resultWriter.newLine();
         }

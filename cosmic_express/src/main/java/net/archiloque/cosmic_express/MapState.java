@@ -22,7 +22,7 @@ final class MapState {
     /**
      * Used for debugging.
      */
-    static boolean FOUND_TRAIN_PATH = false;
+    static int MAX_COMMON_PATH_LENGTH = 0;
 
     private static boolean REGISTERED_SIGNAL = false;
 
@@ -330,6 +330,7 @@ final class MapState {
         grid.set(currentPosition);
 
         // checkTrainPathForDebug(trainPath);
+
         if (REGISTERED_SIGNAL) {
             REGISTERED_SIGNAL = false;
             printGrid(trainPath);
@@ -352,9 +353,9 @@ final class MapState {
                     (!grid.get(targetPositionUp))) {
                 if (isNearAMonsterInOrOut ||
                         (
-                                ((currentLine == 1) || (!previousGridSegment.get(targetPositionUp - level.width))) && // up
-                                        (isFirstColumn || (!previousGridSegment.get(targetPositionUp - 1)) && // left
-                                                (isLastColumn || (!previousGridSegment.get(targetPositionUp + 1))) // right
+                                ((currentLine == 1) || (!newGridCurrentSegment.get(targetPositionUp - level.width))) && // up
+                                        (isFirstColumn || (!newGridCurrentSegment.get(targetPositionUp - 1)) && // left
+                                                (isLastColumn || (!newGridCurrentSegment.get(targetPositionUp + 1))) // right
                                         ))) {
                     nextStates.add(createMapState(grid, newGridCurrentSegment, trainElements, trainPath, currentLine - 1, currentColumn));
                 }
@@ -368,9 +369,9 @@ final class MapState {
                     (!grid.get(targetPositionDown))) {
                 if (isNearAMonsterInOrOut ||
                         (
-                                ((currentLine == (level.height - 2)) || (!previousGridSegment.get(targetPositionDown + level.width))) && // down
-                                        (isFirstColumn || (!previousGridSegment.get(targetPositionDown - 1)) && // left
-                                                (isLastColumn || (!previousGridSegment.get(targetPositionDown + 1))) // right
+                                ((currentLine == (level.height - 2)) || (!newGridCurrentSegment.get(targetPositionDown + level.width))) && // down
+                                        (isFirstColumn || (!newGridCurrentSegment.get(targetPositionDown - 1)) && // left
+                                                (isLastColumn || (!newGridCurrentSegment.get(targetPositionDown + 1))) // right
                                         ))) {
                     nextStates.add(createMapState(grid, newGridCurrentSegment, trainElements, trainPath, currentLine + 1, currentColumn));
                 }
@@ -384,9 +385,9 @@ final class MapState {
                     (!grid.get(targetPositionLeft))) {
                 if (isNearAMonsterInOrOut ||
                         (
-                                (isFirstLine || (!previousGridSegment.get(targetPositionLeft - level.width))) && // up
-                                        (isLastLine || (!previousGridSegment.get(targetPositionLeft + level.width))) && // down
-                                        ((currentColumn == 1) || (!previousGridSegment.get(targetPositionLeft - 1))  // left
+                                (isFirstLine || (!newGridCurrentSegment.get(targetPositionLeft - level.width))) && // up
+                                        (isLastLine || (!newGridCurrentSegment.get(targetPositionLeft + level.width))) && // down
+                                        ((currentColumn == 1) || (!newGridCurrentSegment.get(targetPositionLeft - 1))  // left
                                         ))) {
                     nextStates.add(createMapState(grid, newGridCurrentSegment, trainElements, trainPath, currentLine, currentColumn - 1));
                 }
@@ -400,9 +401,9 @@ final class MapState {
                     (!grid.get(targetPositionRight))) {
                 if (isNearAMonsterInOrOut ||
                         (
-                                (isFirstLine || (!previousGridSegment.get(targetPositionRight - level.width))) && // up
-                                        (isLastLine || (!previousGridSegment.get(targetPositionRight + level.width))) && // down
-                                        ((currentColumn == (level.width - 2)) || (!previousGridSegment.get(targetPositionRight + 1))  // right
+                                (isFirstLine || (!newGridCurrentSegment.get(targetPositionRight - level.width))) && // up
+                                        (isLastLine || (!newGridCurrentSegment.get(targetPositionRight + level.width))) && // down
+                                        ((currentColumn == (level.width - 2)) || (!newGridCurrentSegment.get(targetPositionRight + 1))  // right
                                         ))) {
                     nextStates.add(createMapState(grid, newGridCurrentSegment, trainElements, trainPath, currentLine, currentColumn + 1));
                 }
@@ -414,13 +415,24 @@ final class MapState {
      * Used for debugging
      */
     private void checkTrainPathForDebug(@Nullable CoordinatesLinkedItem trainPath) {
-        if ((TRAIN_PATH_TO_CHECK != null) && (!FOUND_TRAIN_PATH)) {
-            List<Coordinates> trainPathAsList = (trainPath == null) ? new ArrayList<>() : trainPath.getAsList(level);
-            Coordinates[] currentPathArray = trainPathAsList.toArray(new Coordinates[trainPathAsList.size()]);
-            if (Arrays.equals(currentPathArray, TRAIN_PATH_TO_CHECK)) {
-                FOUND_TRAIN_PATH = true;
-                printGrid(trainPath);
+        if(TRAIN_PATH_TO_CHECK == null) {
+            throw new RuntimeException("Forgot to set TRAIN_PATH_TO_CHECK, or forgot to comment!");
+        }
+        List<Coordinates> trainPathAsList = (trainPath == null) ? new ArrayList<>() : trainPath.getAsList(level);
+        Coordinates[] trainPathAsArray = trainPathAsList.toArray(new Coordinates[trainPathAsList.size()]);
+        boolean identical = true;
+        int maxLength = Math.min(trainPathAsArray.length, TRAIN_PATH_TO_CHECK.length);
+        for (int i = 0; identical && (i < maxLength); i++) {
+            if (!trainPathAsArray[i].equals(TRAIN_PATH_TO_CHECK[i])) {
+                identical = false;
+                MAX_COMMON_PATH_LENGTH = Math.max(MAX_COMMON_PATH_LENGTH, i - 1);
             }
+        }
+        if (identical) {
+            MAX_COMMON_PATH_LENGTH = Math.max(MAX_COMMON_PATH_LENGTH, maxLength);
+        }
+        if(MAX_COMMON_PATH_LENGTH == 3) {
+            System.out.println("Break");
         }
     }
 
