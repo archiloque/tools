@@ -1,6 +1,6 @@
 package net.archiloque.cosmic_express;
 
-class Coordinates {
+final class Coordinates {
 
     final int line;
 

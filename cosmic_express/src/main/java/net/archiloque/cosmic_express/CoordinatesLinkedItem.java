@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * An element to build a linked list.
  */
-class CoordinatesLinkedItem {
+final class CoordinatesLinkedItem {
 
     final int line;
 

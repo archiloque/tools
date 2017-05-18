@@ -3,7 +3,7 @@ package net.archiloque.cosmic_express;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class LinkedList<E> {
+final class LinkedList<E> {
 
     private ListElement<E> current;
 

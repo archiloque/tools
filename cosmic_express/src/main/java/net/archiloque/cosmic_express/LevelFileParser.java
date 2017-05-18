@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-class LevelFileParser {
+final class LevelFileParser {
 
     LevelFileParser() {
 

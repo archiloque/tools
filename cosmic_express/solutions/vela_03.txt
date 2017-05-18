@@ -1,0 +1,11 @@
+XXXXXXXXXXX
+↓←←←←←←←←←⇦
+↓→→→→→→→↓XX
+↓↑AOXXXX↓aX
+→↑A↓←←←←←aX
+Q←A↓X→→→↓aX
+X↑A→→↑↓←←aX
+→↑A↓←←←→↓aX
+↑XA→→→→↑↓aX
+↑←←←←←←←←XX
+

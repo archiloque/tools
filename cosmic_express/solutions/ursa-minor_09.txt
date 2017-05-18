@@ -1,0 +1,8 @@
+A→→→↓XXXX
+→↑A↓←aXXX
+↑←X↓OaOXX
+⇩↑←→→→→→Q
+→↓↑←ObOXX
+X↓B↑←bXXX
+B→→→↑XXXX
+

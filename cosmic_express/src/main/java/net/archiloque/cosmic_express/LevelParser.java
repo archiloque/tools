@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-class LevelParser {
+final class LevelParser {
 
     private static final char ENTRY_CHAR = 'I';
     private static final char EXIT_CHAR = 'Q';

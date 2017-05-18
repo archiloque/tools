@@ -1,6 +1,6 @@
 package net.archiloque.cosmic_express;
 
-class TrainElement {
+final class TrainElement {
 
     /**
      * A TrainElementContent

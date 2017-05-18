@@ -5,7 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents the structure of a level.
@@ -27,22 +29,24 @@ final class Level {
     final byte[] grid;
 
     /**
-     * Coordinates of the monsters ins.
+     * Coordinates of the monsters ins => their index.
      */
-    int[] monsterIns;
+    Map<Integer, Integer> monsterInsIndexes;
 
     /**
-     * Coordinates of the monsters outs.
+     * Coordinates of the monsters outs => their index.
      */
-    int[] monsterOuts;
+    Map<Integer, Integer> monsterOutsIndexes;
 
     /**
-     * Coordinates of the monsters in near each position indexed by which monsters ins are not empty.
+     * Coordinates of the monsters in near each position
+     * indexed by the binary representation of which monsters ins are not empty.
      */
     int[][] monsterInsGrids;
 
     /**
-     * Coordinates of the monsters outs near each position indexed by which monsters outs are not empty.
+     * Coordinates of the monsters outs near each position
+     * indexed by the binary representation of which monsters outs are not empty.
      */
     int[][][] monsterOutsGrids;
 
@@ -59,7 +63,7 @@ final class Level {
         Arrays.fill(grid, MapElement.EMPTY_INDEX);
     }
 
-    void setElement(byte mapElement, Coordinates coordinates) {
+    void setElement(byte mapElement, @NotNull Coordinates coordinates) {
         grid[(coordinates.line * width) + coordinates.column] = mapElement;
         if (mapElement == MapElement.ENTRY_INDEX) {
             entryLine = coordinates.line;
@@ -91,18 +95,28 @@ final class Level {
             }
         }
 
-        monsterIns = listToPrimitiveIntArray(monstersInsList);
+        int[] monsterIns = listToPrimitiveIntArray(monstersInsList);
         int monstersInsPossibilities = 1 << monsterIns.length;
         monsterInsGrids = new int[monstersInsPossibilities][];
         for (int i = 0; i < monstersInsPossibilities; i++) {
             monsterInsGrids[i] = calculateMonsterInGrid(i, monsterIns);
         }
 
-        monsterOuts = listToPrimitiveIntArray(monstersOutsList);
+        monsterInsIndexes = new HashMap<>(monsterIns.length);
+        for(int i = 0; i < monsterIns.length; i++) {
+            monsterInsIndexes.put(monsterIns[i], i);
+        }
+
+        int[] monsterOuts = listToPrimitiveIntArray(monstersOutsList);
         int monstersOutsPossibilities = 1 << monsterOuts.length;
         monsterOutsGrids = new int[monstersOutsPossibilities][][];
         for (int i = 0; i < monstersOutsPossibilities; i++) {
             monsterOutsGrids[i] = calculateMonsterOutGrid(i, monsterOuts);
+        }
+
+        monsterOutsIndexes = new HashMap<>(monsterOuts.length);
+        for(int i = 0; i < monsterOuts.length; i++) {
+            monsterOutsIndexes.put(monsterOuts[i], i);
         }
 
         TrainElement[] trainElements = new TrainElement[trainSize];

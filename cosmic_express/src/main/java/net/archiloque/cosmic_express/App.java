@@ -58,7 +58,7 @@ public class App {
         Level level = levelFileParser.parseFile(problemsFile);
         String problemName = fileName.substring(0, fileName.length() - 4);
         try (BufferedWriter resultWriter = Files.newBufferedWriter(Paths.get("solutions/" + problemName + ".txt"))) {
-            printWithTimestamp(fileName, "Init level");
+            printWithTimestamp(problemName, "Init level");
             List<MapState> mapStates = level.createMapStates();
             if (mapStates.size() == 1) {
                 solveProblem(problemName, "", mapStates.get(0), resultWriter);
@@ -74,7 +74,7 @@ public class App {
                                      @NotNull String levelName,
                                      @NotNull MapState mapState,
                                      @NotNull BufferedWriter resultWriter) throws IOException {
-        printWithTimestamp(problemName, "[" + levelName + "] Calculating problem");
+        printWithTimestamp(problemName, displayedLevelName(levelName) + "Calculating problem");
         if (!levelName.isEmpty()) {
             resultWriter.write(levelName);
             resultWriter.newLine();
@@ -89,7 +89,7 @@ public class App {
             solution = nextCandidate.processState(states);
             if (solution) {
                 long stopTime = System.nanoTime();
-                printWithTimestamp(problemName, levelName.isEmpty() ? "" : ("[" + levelName + "] ") + "Solved in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
+                printWithTimestamp(problemName, displayedLevelName(levelName) + "Solved in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
                 String[] solutionAsStringArray = nextCandidate.printableGrid();
                 for (String solutionLine : solutionAsStringArray) {
                     resultWriter.write(solutionLine);
@@ -99,7 +99,7 @@ public class App {
         }
         if (!solution) {
             long stopTime = System.nanoTime();
-            printWithTimestamp(problemName, levelName.isEmpty() ? "" : ("[" + levelName + "] ") + "Failed to solve in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
+            printWithTimestamp(problemName, displayedLevelName(levelName) + "Failed to solve in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
             resultWriter.write("FAILED");
             resultWriter.newLine();
         }
@@ -109,6 +109,11 @@ public class App {
 
     private static void printWithTimestamp(@NotNull String problemsSet, @NotNull String message) {
         System.out.println(problemsSet + " " + DATE_FORMAT.format(new Date()) + " " + message);
+    }
+
+    @NotNull
+    private static String displayedLevelName(@NotNull String levelName) {
+        return levelName.isEmpty() ? "" : ("[" + levelName + "] ");
     }
 
 }

@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Nullable;
 import sun.misc.Signal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
@@ -281,7 +280,7 @@ final class MapState {
                         newTrainElementTaintedByGreenMonster = true;
                     }
                     newTrainElementContent = possibleNewTrainElementContent;
-                    monsterInsIndex -= 1 << Arrays.binarySearch(level.monsterIns, monsterInCoordinates);
+                    monsterInsIndex -= (1 << level.monsterInsIndexes.get(monsterInCoordinates));
                     monsterInsGrid = level.monsterInsGrids[monsterInsIndex];
                     enteredNewSegment = true;
                 }
@@ -309,7 +308,7 @@ final class MapState {
             int monsterOutElement = level.grid[monsterOutCoordinates];
             if ((trainElementContent == monsterOutElement) || (monsterOutElement == MapElement.MONSTER_RED_OUT_EMPTY_INDEX)) {
                 newMissingNumberOfMonsters--;
-                monsterOutsIndex -= 1 << Arrays.binarySearch(level.monsterOuts, monsterOutCoordinates);
+                monsterOutsIndex -= 1 << level.monsterOutsIndexes.get(monsterOutCoordinates);
                 monsterOutsGrid = level.monsterOutsGrids[monsterOutsIndex];
                 return true;
             }
@@ -415,7 +414,7 @@ final class MapState {
      * Used for debugging
      */
     private void checkTrainPathForDebug(@Nullable CoordinatesLinkedItem trainPath) {
-        if(TRAIN_PATH_TO_CHECK == null) {
+        if (TRAIN_PATH_TO_CHECK == null) {
             throw new RuntimeException("Forgot to set TRAIN_PATH_TO_CHECK, or forgot to comment!");
         }
         List<Coordinates> trainPathAsList = (trainPath == null) ? new ArrayList<>() : trainPath.getAsList(level);
@@ -431,7 +430,7 @@ final class MapState {
         if (identical) {
             MAX_COMMON_PATH_LENGTH = Math.max(MAX_COMMON_PATH_LENGTH, maxLength);
         }
-        if(MAX_COMMON_PATH_LENGTH == 3) {
+        if (MAX_COMMON_PATH_LENGTH == 3) {
             System.out.println("Break");
         }
     }
