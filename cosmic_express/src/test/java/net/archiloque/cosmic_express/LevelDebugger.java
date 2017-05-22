@@ -2,7 +2,6 @@ package net.archiloque.cosmic_express;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LevelDebugger {
@@ -10,68 +9,77 @@ public class LevelDebugger {
     @Test
     public void testLevel1() {
         LevelParser levelParser = new LevelParser();
-        Level level = levelParser.readLevel(("BXQXXXXXXIXA\n" +
-                "XXXXcXXaXXXX\n" +
-                "XXXXXXXXXXXX\n" +
-                "XXXXXXXXXXXX\n" +
-                "XXXXbXXcXXXX\n" +
-                "AXXXXXXXXXXB").split("\n"), 2);
+        Level level = levelParser.readLevel(("XXXXXXXOOO\n" +
+                "XOOXXXXXXX\n" +
+                "XBBXcXcXaX\n" +
+                "XXOXXXXXOX\n" +
+                "IXOOAXAXXQ\n" +
+                "XXXXXXXXXO\n" +
+                "XBBXcOcOaO\n" +
+                "XOOXXXXOOO\n" +
+                "XXXXXXXOOO").split("\n"), 2);
         Coordinates[] solutionPath = new Coordinates[]{
-                new Coordinates(0,9),
-                new Coordinates(0,10),
-                new Coordinates(1,10),
-                new Coordinates(1,9),
-                new Coordinates(2,9),
-                new Coordinates(2,8),
-                new Coordinates(3,8),
-                new Coordinates(4,8),
-                new Coordinates(4,9),
-                new Coordinates(4,10),
-                new Coordinates(5,10),
-                new Coordinates(5,9),
-                new Coordinates(5,8),
-                new Coordinates(5,7),
-                new Coordinates(5,6),
-                new Coordinates(5,5),
-                new Coordinates(5,4),
+                new Coordinates(4,0),
+                new Coordinates(5,0),
+                new Coordinates(6,0),
+                new Coordinates(7,0),
+                new Coordinates(8,0),
+                new Coordinates(8,1),
+                new Coordinates(8,2),
+                new Coordinates(8,3),
+                new Coordinates(8,4),
+                new Coordinates(8,5),
+                new Coordinates(8,6),
+                new Coordinates(7,6),
+                new Coordinates(7,5),
+                new Coordinates(7,4),
+                new Coordinates(7,3),
+                new Coordinates(6,3),
                 new Coordinates(5,3),
                 new Coordinates(5,2),
                 new Coordinates(5,1),
                 new Coordinates(4,1),
-                new Coordinates(4,2),
-                new Coordinates(4,3),
+                new Coordinates(3,1),
+                new Coordinates(3,0),
+                new Coordinates(2,0),
+                new Coordinates(1,0),
+                new Coordinates(0,0),
+                new Coordinates(0,1),
+                new Coordinates(0,2),
+                new Coordinates(0,3),
+                new Coordinates(0,4),
+                new Coordinates(0,5),
+                new Coordinates(0,6),
+                new Coordinates(1,6),
+                new Coordinates(1,5),
+                new Coordinates(1,4),
+                new Coordinates(1,3),
+                new Coordinates(2,3),
                 new Coordinates(3,3),
                 new Coordinates(3,4),
                 new Coordinates(3,5),
-                new Coordinates(3,6),
+                new Coordinates(4,5),
+                new Coordinates(5,5),
+                new Coordinates(5,6),
+                new Coordinates(5,7),
+                new Coordinates(5,8),
+                new Coordinates(4,8),
+                new Coordinates(4,7),
                 new Coordinates(3,7),
                 new Coordinates(2,7),
-                new Coordinates(2,6),
-                new Coordinates(2,5),
-                new Coordinates(2,4),
-                new Coordinates(2,3),
-                new Coordinates(2,2),
-                new Coordinates(2,1),
-                new Coordinates(2,0),
-                new Coordinates(1,0),
-                new Coordinates(1,1),
-                new Coordinates(1,2),
-                new Coordinates(1,3),
-                new Coordinates(0,3),
-                new Coordinates(0,2)
-        };
-        int currentSolutionIndex = solutionPath.length;
+                new Coordinates(1,7),
+                new Coordinates(1,8),
+                new Coordinates(1,9),
+                new Coordinates(2,9),
+                new Coordinates(3,9),
+                new Coordinates(4,9)
 
+        };
         List<MapState> mapStates = level.createMapStates();
         if (mapStates.size() != 1) {
             throw new RuntimeException("Several map states, error !");
         }
-
-        List<Coordinates> coordinatesList = new ArrayList<>(currentSolutionIndex);
-        for(int i = 0; i < currentSolutionIndex; i++) {
-            coordinatesList.add(solutionPath[i]);
-        }
-        MapState.TRAIN_PATH_TO_CHECK = coordinatesList.toArray(new Coordinates[coordinatesList.size()]);
+        MapState.TRAIN_PATH_TO_CHECK = solutionPath;
         LinkedList<MapState> states = new LinkedList<>();
         states.add(mapStates.get(0));
 

@@ -1,0 +1,12 @@
+XXXAXXXAXXX
+QX↓←XXX↓←XX
+↑X↓↑←←←←↑XX
+↑←←aXbXa↑←←
+XB→→→→→→↓B↑
+→→↑bXXXb↓X↑
+↑BXXXX↓←←B↑
+↑XXaXb↓a→→↑
+↑←←←←←→↓↑XX
+⇨→→→→↑X→↑XX
+XXXAXXXAXXX
+

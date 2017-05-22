@@ -32,7 +32,6 @@ final class CoordinatesLinkedItem {
             trainPathList.add(new Coordinates(trainPath.line, trainPath.column));
             trainPath = trainPath.previous;
         }
-        trainPathList.add(new Coordinates(level.entryLine, level.entryColumn));
         Collections.reverse(trainPathList);
         return trainPathList;
     }

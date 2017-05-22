@@ -21,7 +21,16 @@ final class LevelParser {
     private static final char MONSTER_GREEN_IN_FILLED_CHAR = 'D';
     private static final char MONSTER_GREEN_OUT_EMPTY_CHAR = 'd';
 
+    private static final char I_MONSTER_PURPLE_IN_FILLED_CHAR = 'Ⓐ';
+    private static final char I_MONSTER_PURPLE_OUT_EMPTY_CHAR = 'ⓐ';
+    private static final char I_MONSTER_ORANGE_IN_FILLED_CHAR = 'Ⓑ';
+    private static final char I_MONSTER_ORANGE_OUT_EMPTY_CHAR = 'ⓑ';
+    private static final char I_MONSTER_RED_OUT_EMPTY_CHAR = 'ⓒ';
+    private static final char I_MONSTER_GREEN_IN_FILLED_CHAR = 'Ⓓ';
+    private static final char I_MONSTER_GREEN_OUT_EMPTY_CHAR = 'ⓓ';
+
     final @NotNull Map<Byte, Character> elementsToChars = new HashMap<>();
+    final @NotNull Map<Byte, Character> elementsToInvertChar = new HashMap<>();
     private final @NotNull Map<Character, Byte> charsToElements = new HashMap<>();
 
     LevelParser() {
@@ -41,6 +50,17 @@ final class LevelParser {
 
         elementsToChars.put(MapElement.MONSTER_GREEN_IN_FILLED_INDEX, MONSTER_GREEN_IN_FILLED_CHAR);
         elementsToChars.put(MapElement.MONSTER_GREEN_OUT_EMPTY_INDEX, MONSTER_GREEN_OUT_EMPTY_CHAR);
+
+        elementsToInvertChar.put(MapElement.MONSTER_PURPLE_IN_FILLED_INDEX, I_MONSTER_PURPLE_IN_FILLED_CHAR);
+        elementsToInvertChar.put(MapElement.MONSTER_PURPLE_OUT_EMPTY_INDEX, I_MONSTER_PURPLE_OUT_EMPTY_CHAR);
+
+        elementsToInvertChar.put(MapElement.MONSTER_ORANGE_IN_FILLED_INDEX, I_MONSTER_ORANGE_IN_FILLED_CHAR);
+        elementsToInvertChar.put(MapElement.MONSTER_ORANGE_OUT_EMPTY_INDEX, I_MONSTER_ORANGE_OUT_EMPTY_CHAR);
+
+        elementsToInvertChar.put(MapElement.MONSTER_RED_OUT_EMPTY_INDEX, I_MONSTER_RED_OUT_EMPTY_CHAR);
+
+        elementsToInvertChar.put(MapElement.MONSTER_GREEN_IN_FILLED_INDEX, I_MONSTER_GREEN_IN_FILLED_CHAR);
+        elementsToInvertChar.put(MapElement.MONSTER_GREEN_OUT_EMPTY_INDEX, I_MONSTER_GREEN_OUT_EMPTY_CHAR);
 
         charsToElements.put(ENTRY_CHAR, MapElement.ENTRY_INDEX);
         charsToElements.put(EXIT_CHAR, MapElement.EXIT_INDEX);

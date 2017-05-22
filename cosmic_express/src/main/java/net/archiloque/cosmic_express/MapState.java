@@ -254,35 +254,51 @@ final class MapState {
         byte newTrainElementContent = previousTrainElement.content;
         boolean newTrainElementTaintedByGreenMonster = previousTrainElement.taintedByGreenMonster;
 
-        int[] monsterOuts = monsterOutsGrid[newTrainElementLocalCoordinates];
-        if (monsterOuts != null) {
-            if (trainElementIndex != (level.trainSize - 1)) {
-                isNearAMonsterInOrOut = true;
-            }
-            if (newTrainElementContent != TrainElementContent.NO_CONTENT) {
-                if (canEmpty(monsterOuts, newTrainElementContent)) {
-                    newTrainElementContent = TrainElementContent.NO_CONTENT;
-                    enteredNewSegment = true;
+        {
+            int[] monsterOuts = monsterOutsGrid[newTrainElementLocalCoordinates];
+            if (monsterOuts != null) {
+                if (trainElementIndex != (level.trainSize - 1)) {
+                    isNearAMonsterInOrOut = true;
+                }
+                if (newTrainElementContent != TrainElementContent.NO_CONTENT) {
+                    if (canEmpty(monsterOuts, newTrainElementContent)) {
+                        newTrainElementContent = TrainElementContent.NO_CONTENT;
+                        enteredNewSegment = true;
+                    }
                 }
             }
         }
 
-        int monsterInCoordinates = monsterInsGrid[newTrainElementLocalCoordinates];
-        if (monsterInCoordinates != -1) {
-            if (trainElementIndex != (level.trainSize - 1)) {
-                isNearAMonsterInOrOut = true;
-            }
-            if (newTrainElementContent == TrainElementContent.NO_CONTENT) {
-                int element = level.grid[monsterInCoordinates];
-                byte possibleNewTrainElementContent = MapElement.MONSTER[element];
-                if ((!newTrainElementTaintedByGreenMonster) || (possibleNewTrainElementContent == TrainElementContent.MONSTER_GREEN)) {
-                    if (possibleNewTrainElementContent == TrainElementContent.MONSTER_GREEN) {
-                        newTrainElementTaintedByGreenMonster = true;
+        {
+            int monsterInCoordinates = monsterInsGrid[newTrainElementLocalCoordinates];
+            if (monsterInCoordinates != -1) {
+                if (trainElementIndex != (level.trainSize - 1)) {
+                    isNearAMonsterInOrOut = true;
+                }
+                if (newTrainElementContent == TrainElementContent.NO_CONTENT) {
+                    int element = level.grid[monsterInCoordinates];
+                    byte possibleNewTrainElementContent = MapElement.MONSTER[element];
+                    if ((!newTrainElementTaintedByGreenMonster) || (possibleNewTrainElementContent == TrainElementContent.MONSTER_GREEN)) {
+                        if (possibleNewTrainElementContent == TrainElementContent.MONSTER_GREEN) {
+                            newTrainElementTaintedByGreenMonster = true;
+                        }
+                        newTrainElementContent = possibleNewTrainElementContent;
+                        monsterInsIndex -= (1 << level.monsterInsIndexes.get(monsterInCoordinates));
+                        monsterInsGrid = level.monsterInsGrids[monsterInsIndex];
+                        enteredNewSegment = true;
                     }
-                    newTrainElementContent = possibleNewTrainElementContent;
-                    monsterInsIndex -= (1 << level.monsterInsIndexes.get(monsterInCoordinates));
-                    monsterInsGrid = level.monsterInsGrids[monsterInsIndex];
-                    enteredNewSegment = true;
+                }
+            }
+        }
+
+        {
+            int[] monsterOuts = monsterOutsGrid[newTrainElementLocalCoordinates];
+            if (monsterOuts != null) {
+                if (newTrainElementContent != TrainElementContent.NO_CONTENT) {
+                    if (canEmpty(monsterOuts, newTrainElementContent)) {
+                        newTrainElementContent = TrainElementContent.NO_CONTENT;
+                        enteredNewSegment = true;
+                    }
                 }
             }
         }
@@ -308,7 +324,7 @@ final class MapState {
             int monsterOutElement = level.grid[monsterOutCoordinates];
             if ((trainElementContent == monsterOutElement) || (monsterOutElement == MapElement.MONSTER_RED_OUT_EMPTY_INDEX)) {
                 newMissingNumberOfMonsters--;
-                monsterOutsIndex -= 1 << level.monsterOutsIndexes.get(monsterOutCoordinates);
+                monsterOutsIndex -= (1 << level.monsterOutsIndexes.get(monsterOutCoordinates));
                 monsterOutsGrid = level.monsterOutsGrids[monsterOutsIndex];
                 return true;
             }
@@ -333,6 +349,9 @@ final class MapState {
         if (REGISTERED_SIGNAL) {
             REGISTERED_SIGNAL = false;
             printGrid(trainPath);
+            if (TRAIN_PATH_TO_CHECK != null) {
+                System.out.println(MAX_COMMON_PATH_LENGTH);
+            }
         }
 
         BitSet newGridCurrentSegment = enteredNewSegment ?
@@ -350,7 +369,7 @@ final class MapState {
             int targetPositionUp = currentPosition - level.width;
             if ((!isFirstLine) &&
                     (!grid.get(targetPositionUp))) {
-                if (isNearAMonsterInOrOut ||
+                if (isNearAMonsterInOrOut || enteredNewSegment ||
                         (
                                 ((currentLine == 1) || (!newGridCurrentSegment.get(targetPositionUp - level.width))) && // up
                                         (isFirstColumn || (!newGridCurrentSegment.get(targetPositionUp - 1)) && // left
@@ -366,7 +385,7 @@ final class MapState {
             int targetPositionDown = currentPosition + level.width;
             if ((!isLastLine) &&
                     (!grid.get(targetPositionDown))) {
-                if (isNearAMonsterInOrOut ||
+                if (isNearAMonsterInOrOut || enteredNewSegment ||
                         (
                                 ((currentLine == (level.height - 2)) || (!newGridCurrentSegment.get(targetPositionDown + level.width))) && // down
                                         (isFirstColumn || (!newGridCurrentSegment.get(targetPositionDown - 1)) && // left
@@ -382,7 +401,7 @@ final class MapState {
             int targetPositionLeft = currentPosition - 1;
             if ((!isFirstColumn) &&
                     (!grid.get(targetPositionLeft))) {
-                if (isNearAMonsterInOrOut ||
+                if (isNearAMonsterInOrOut || enteredNewSegment ||
                         (
                                 (isFirstLine || (!newGridCurrentSegment.get(targetPositionLeft - level.width))) && // up
                                         (isLastLine || (!newGridCurrentSegment.get(targetPositionLeft + level.width))) && // down
@@ -398,7 +417,7 @@ final class MapState {
             int targetPositionRight = currentPosition + 1;
             if ((!isLastColumn) &&
                     (!grid.get(targetPositionRight))) {
-                if (isNearAMonsterInOrOut ||
+                if (isNearAMonsterInOrOut || enteredNewSegment ||
                         (
                                 (isFirstLine || (!newGridCurrentSegment.get(targetPositionRight - level.width))) && // up
                                         (isLastLine || (!newGridCurrentSegment.get(targetPositionRight + level.width))) && // down
@@ -415,22 +434,19 @@ final class MapState {
      */
     private void checkTrainPathForDebug(@Nullable CoordinatesLinkedItem trainPath) {
         if (TRAIN_PATH_TO_CHECK == null) {
-            throw new RuntimeException("Forgot to set TRAIN_PATH_TO_CHECK, or forgot to comment!");
+            throw new RuntimeException("Forgot to set TRAIN_PATH_TO_CHECK, or forgot to comment call to checkTrainPathForDebug !");
         }
         List<Coordinates> trainPathAsList = (trainPath == null) ? new ArrayList<>() : trainPath.getAsList(level);
         Coordinates[] trainPathAsArray = trainPathAsList.toArray(new Coordinates[trainPathAsList.size()]);
-        boolean identical = true;
         int maxLength = Math.min(trainPathAsArray.length, TRAIN_PATH_TO_CHECK.length);
-        for (int i = 0; identical && (i < maxLength); i++) {
+        for (int i = 0; i < maxLength; i++) {
             if (!trainPathAsArray[i].equals(TRAIN_PATH_TO_CHECK[i])) {
-                identical = false;
                 MAX_COMMON_PATH_LENGTH = Math.max(MAX_COMMON_PATH_LENGTH, i - 1);
+                return;
             }
         }
-        if (identical) {
-            MAX_COMMON_PATH_LENGTH = Math.max(MAX_COMMON_PATH_LENGTH, maxLength);
-        }
-        if (MAX_COMMON_PATH_LENGTH == 3) {
+        MAX_COMMON_PATH_LENGTH = Math.max(MAX_COMMON_PATH_LENGTH, maxLength);
+        if (MAX_COMMON_PATH_LENGTH == 53) {
             System.out.println("Break");
         }
     }
@@ -476,7 +492,8 @@ final class MapState {
         for (int lineIndex = 0; lineIndex < level.height; lineIndex++) {
             char[] lineChar = new char[level.width];
             for (int columnIndex = 0; columnIndex < level.width; columnIndex++) {
-                byte element = level.grid[(lineIndex * level.width) + columnIndex];
+                int position = (lineIndex * level.width) + columnIndex;
+                byte element = level.grid[position];
                 Character character = levelParser.elementsToChars.get(element);
                 if (character == null) {
                     throw new RuntimeException("Unknown element [" + element + "]");
@@ -485,9 +502,28 @@ final class MapState {
                     character = MapElement.EMPTY_INDEX;
                 }
                 lineChar[columnIndex] = character;
+
+
+                if (TRAIN_PATH_TO_CHECK != null) {
+                    if (level.monsterInsIndexes.containsKey(position)) {
+                        int monsterInIndex = level.monsterInsIndexes.get(position);
+                        if ((monsterInsIndex >> monsterInIndex) == 0) {
+                            lineChar[columnIndex] = levelParser.elementsToInvertChar.get(element);
+                        }
+                    }
+
+                    if (level.monsterOutsIndexes.containsKey(position)) {
+                        int monsterOutIndex = level.monsterOutsIndexes.get(position);
+                        if ((monsterOutsIndex >> monsterOutIndex) == 0) {
+                            lineChar[columnIndex] = levelParser.elementsToInvertChar.get(element);
+                        }
+                    }
+                }
+
             }
             result[lineIndex] = lineChar;
         }
+
 
         Coordinates currentPoint = new Coordinates(level.entryLine, level.entryColumn);
         result[level.entryLine][level.entryColumn] = levelParser.elementsToChars.get(MapElement.ENTRY_INDEX);

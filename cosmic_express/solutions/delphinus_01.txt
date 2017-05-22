@@ -1,8 +1,8 @@
-→→→→→QXXXXX
-↑XX↓←←←XXXX
-↑←D↓XA↑←D↓←
-⇩↑←←→→↓↑←←↑
-→↓dX↑a→↓dX↑
-X→→→↑XX→→→↑
+→→→→↓Q←←←←←
+↑XXX→→→→→↓↑
+↑←DXXAXXD↓↑
+⇩↑←←←←←XX↓↑
+→↓dXXa↑←d→↑
+X→→→→→→↑XXX
 XXXXXXXXXXX
 
