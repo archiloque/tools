@@ -93,6 +93,9 @@ def create_table(number_of_workers, basic_workers, base_skills)
       combination.each do |worker|
         workers_skills = workers_skills | WORKERS_SKILLS[worker]
       end
+      if base_skills
+        workers_skills = workers_skills & BASE_SKILLS
+      end
       current_line = ["#{(workers_skills.length == target_skills.length) ? "✓" : " "} #{combination.sort.join(', ')}"]
       target_skills.each do |s|
         current_line << ((workers_skills.include? s) ? "✓" : "")
