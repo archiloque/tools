@@ -9,15 +9,16 @@ public class LevelDebugger {
     @Test
     public void testLevel1() {
         LevelParser levelParser = new LevelParser();
-        Level level = levelParser.readLevel(("XXXXXXXOOO\n" +
-                "XOOXXXXXXX\n" +
-                "XBBXcXcXaX\n" +
-                "XXOXXXXXOX\n" +
-                "IXOOAXAXXQ\n" +
-                "XXXXXXXXXO\n" +
-                "XBBXcOcOaO\n" +
-                "XOOXXXXOOO\n" +
-                "XXXXXXXOOO").split("\n"), 2);
+        Level level = levelParser.readLevel((
+                "XXXIXXXQXXX\n" +
+                "XDXXXXXXXdX\n" +
+                "XXXXXXXXXXX\n" +
+                "XXXXXXXXXXX\n" +
+                "XAXXXbXXXXX\n" +
+                "XXXXXXXXXXX\n" +
+                "XXXXXBXXXXX\n" +
+                "XdXXXXXXXdX\n" +
+                "XXXXXXXXXXX").split("\n"), 2);
         Coordinates[] solutionPath = new Coordinates[]{
                 new Coordinates(4,0),
                 new Coordinates(5,0),
