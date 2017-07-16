@@ -54,7 +54,7 @@ results.sort! do |x,y|
   if y[:skills].length != x[:skills].length
     y[:skills].length <=> x[:skills].length
   else
-    x[:tiers_2_workers] <=> y[:tiers_2_workers]
+    y[:tiers_2_workers] <=> x[:tiers_2_workers]
   end
 end
 
