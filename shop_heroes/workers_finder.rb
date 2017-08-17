@@ -4,13 +4,8 @@ require 'terminal-table'
 require 'set'
 require_relative 'workers_info'
 
-number_of_slots = 4
-available_workers = TIERS_1_WORKERS + [
-  WORKER_FLETCHER,
-  WORKER_ARTIFICER,
-  WORKER_LUTHIER,
-  WORKER_JEWELER
-]
+number_of_slots = 5
+available_workers = TIERS_1_WORKERS + TIERS_2_WORKERS
 
 def count_workers_by_tier(workers, workers_list)
   workers.count do |w|
