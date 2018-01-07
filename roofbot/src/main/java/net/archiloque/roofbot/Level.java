@@ -34,6 +34,8 @@ final class Level {
 
     final List<Integer>[] basementTiles;
 
+    final List<Coordinates> teleportersTiles = new ArrayList<>();
+
     Level(int height, int width) {
         this.height = height;
         this.width = width;
@@ -49,10 +51,11 @@ final class Level {
         if (mapElement == MapElement.ENTRY_INDEX) {
             entryLine = line;
             entryColumn = column;
-        }
-        if (mapElement == MapElement.EXIT_INDEX) {
+        } else if (mapElement == MapElement.EXIT_INDEX) {
             exitLine = line;
             exitColumn = column;
+        } else if(mapElement == MapElement.TELEPORTER_INDEX) {
+            teleportersTiles.add(new Coordinates(line, column));
         }
         if (MapElement.HOLES.contains(mapElement)) {
             numberOfElements++;

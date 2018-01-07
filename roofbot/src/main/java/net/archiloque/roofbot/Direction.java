@@ -9,6 +9,7 @@ final class Direction {
     final static byte DOWN = 1;
     final static byte LEFT = 2;
     final static byte RIGHT = 3;
+    final static byte TELEPORT = 4;
 
     static char toChar(int direction) {
         if (direction == UP) {

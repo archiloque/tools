@@ -215,6 +215,28 @@ final class MapState {
                     targetCurrentObject,
                     targetNumberOfUnfilledElements,
                     path);
+        } else if(
+                (targetPositionContent == MapElement.TELEPORTER_INDEX) &&
+                        (direction != Direction.TELEPORT)
+                ) {
+            Coordinates currentCoordinates = new Coordinates(targetLine, targetColumn);
+            Coordinates teleporterExit = level.
+                    teleportersTiles.
+                    stream().
+                    filter(tc -> ! tc.equals(currentCoordinates)).
+                    findFirst().
+                    get();
+            return tryToGo(
+                    Direction.TELEPORT,
+                    teleporterExit.line * level.width + teleporterExit.column,
+                    teleporterExit.column,
+                    teleporterExit.line,
+                    targetGridStrengths,
+                    targetCurrentObject,
+                    targetNumberOfUnfilledElements,
+                    new CoordinatesLinkedItem(targetLine, targetColumn, path)
+            );
+
         }
         return new MapState(
                 level,
