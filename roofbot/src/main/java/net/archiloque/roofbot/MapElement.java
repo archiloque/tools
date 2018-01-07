@@ -9,7 +9,10 @@ final class MapElement {
     final static byte VOID_INDEX = EMPTY_INDEX + 1;
     final static byte ENTRY_INDEX = VOID_INDEX + 1;
     final static byte EXIT_INDEX = ENTRY_INDEX + 1;
-    final static byte TRIGGER_1_INDEX = EXIT_INDEX + 1;
+
+    final static byte FAN_INDEX = EXIT_INDEX + 1;
+
+    final static byte TRIGGER_1_INDEX = FAN_INDEX + 1;
     final static byte TRIGGER_2_INDEX = TRIGGER_1_INDEX + 1;
 
     final static byte GREEN_OBJECT_INDEX = TRIGGER_2_INDEX + 1;
@@ -60,14 +63,20 @@ final class MapElement {
         setValues(VOID_INDEX, false, true, EMPTY_INDEX, false, false, false);
         setValues(ENTRY_INDEX, false, false, EMPTY_INDEX, false, false, false);
         setValues(EXIT_INDEX, true, false, EMPTY_INDEX, false, false, false);
+        setValues(FAN_INDEX, true, true, EMPTY_INDEX, false, true, false);
+
         setValues(TRIGGER_1_INDEX, true, true, EMPTY_INDEX, false, true, true);
         setValues(TRIGGER_2_INDEX, true, true, EMPTY_INDEX, false, true, true);
+
         setValues(GREEN_OBJECT_INDEX, true, false, EMPTY_INDEX, true, false, false);
         setValues(GREEN_HOLE_INDEX, false, true, GREEN_OBJECT_INDEX, false, false, false);
+
         setValues(BLUE_OBJECT_INDEX, true, false, EMPTY_INDEX, true, false, false);
         setValues(BLUE_HOLE_INDEX, false, true, BLUE_OBJECT_INDEX, false, false, false);
+
         setValues(YELLOW_OBJECT_INDEX, true, false, EMPTY_INDEX, true, false, false);
         setValues(YELLOW_HOLE_INDEX, false, true, YELLOW_OBJECT_INDEX, false, false, false);
+
         setValues(RED_OBJECT_INDEX, true, false, EMPTY_INDEX, true, false, false);
         setValues(RED_HOLE_INDEX, false, true, RED_OBJECT_INDEX, false, false, false);
     }

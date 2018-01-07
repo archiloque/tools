@@ -11,6 +11,8 @@ final class LevelParser {
     private static final char EXIT_CHAR = 'O';
     private static final char EMPTY_CHAR = 'X';
     private static final char VOID_CHAR = '0';
+    private static final char FAN_CHAR = 'F';
+    
     private static final char TRIGGER_1_CHAR = '⊤';
     private static final char TRIGGER_2_CHAR = '⊥';
 
@@ -26,54 +28,32 @@ final class LevelParser {
     private static final char RED_OBJECT = 'R';
     private static final char RED_HOLE = 'r';
 
-
     private final @NotNull Map<Character, Byte> charsToElements = new HashMap<>();
     private final @NotNull Map<Character, Integer> charsToStrength = new HashMap<>();
     private final @NotNull Map<Character, Byte> charsToBasement = new HashMap<>();
     final @NotNull Map<Byte, Character> elementsToChars = new HashMap<>();
 
     LevelParser() {
-        charsToElements.put(ENTRY_CHAR, MapElement.ENTRY_INDEX);
-        elementsToChars.put(MapElement.ENTRY_INDEX, ENTRY_CHAR);
+        addElement(ENTRY_CHAR,MapElement.ENTRY_INDEX);
+        addElement(EXIT_CHAR, MapElement.EXIT_INDEX);
+        addElement(EMPTY_CHAR, MapElement.EMPTY_INDEX);
+        addElement(VOID_CHAR, MapElement.VOID_INDEX);
+        addElement(FAN_CHAR, MapElement.FAN_INDEX);
+        
+        addElement(TRIGGER_1_CHAR, MapElement.TRIGGER_1_INDEX);
+        addElement(TRIGGER_2_CHAR, MapElement.TRIGGER_2_INDEX);
+        
+        addElement(GREEN_OBJECT, MapElement.GREEN_OBJECT_INDEX);
+        addElement(GREEN_HOLE, MapElement.GREEN_HOLE_INDEX);
 
-        charsToElements.put(VOID_CHAR, MapElement.VOID_INDEX);
-        elementsToChars.put(MapElement.VOID_INDEX, VOID_CHAR);
+        addElement(BLUE_OBJECT, MapElement.BLUE_OBJECT_INDEX);
+        addElement(BLUE_HOLE, MapElement.BLUE_HOLE_INDEX);
 
-        charsToElements.put(TRIGGER_1_CHAR, MapElement.TRIGGER_1_INDEX);
-        elementsToChars.put(MapElement.TRIGGER_1_INDEX, TRIGGER_1_CHAR);
+        addElement(YELLOW_OBJECT, MapElement.YELLOW_OBJECT_INDEX);
+        addElement(YELLOW_HOLE, MapElement.YELLOW_HOLE_INDEX);
 
-        charsToElements.put(TRIGGER_2_CHAR, MapElement.TRIGGER_2_INDEX);
-        elementsToChars.put(MapElement.TRIGGER_2_INDEX, TRIGGER_2_CHAR);
-
-        charsToElements.put(EXIT_CHAR, MapElement.EXIT_INDEX);
-        elementsToChars.put(MapElement.EXIT_INDEX, EXIT_CHAR);
-
-        charsToElements.put(EMPTY_CHAR, MapElement.EMPTY_INDEX);
-        elementsToChars.put(MapElement.EMPTY_INDEX, EMPTY_CHAR);
-
-        charsToElements.put(GREEN_OBJECT, MapElement.GREEN_OBJECT_INDEX);
-        elementsToChars.put(MapElement.GREEN_OBJECT_INDEX, GREEN_OBJECT);
-
-        charsToElements.put(GREEN_HOLE, MapElement.GREEN_HOLE_INDEX);
-        elementsToChars.put(MapElement.GREEN_HOLE_INDEX, GREEN_HOLE);
-
-        charsToElements.put(BLUE_OBJECT, MapElement.BLUE_OBJECT_INDEX);
-        elementsToChars.put(MapElement.BLUE_OBJECT_INDEX, BLUE_OBJECT);
-
-        charsToElements.put(BLUE_HOLE, MapElement.BLUE_HOLE_INDEX);
-        elementsToChars.put(MapElement.BLUE_HOLE_INDEX, BLUE_HOLE);
-
-        charsToElements.put(YELLOW_OBJECT, MapElement.YELLOW_OBJECT_INDEX);
-        elementsToChars.put(MapElement.YELLOW_OBJECT_INDEX, YELLOW_OBJECT);
-
-        charsToElements.put(YELLOW_HOLE, MapElement.YELLOW_HOLE_INDEX);
-        elementsToChars.put(MapElement.YELLOW_HOLE_INDEX, YELLOW_HOLE);
-
-        charsToElements.put(RED_OBJECT, MapElement.RED_OBJECT_INDEX);
-        elementsToChars.put(MapElement.RED_OBJECT_INDEX, RED_OBJECT);
-
-        charsToElements.put(RED_HOLE, MapElement.RED_HOLE_INDEX);
-        elementsToChars.put(MapElement.RED_HOLE_INDEX, RED_HOLE);
+        addElement(RED_OBJECT, MapElement.RED_OBJECT_INDEX);
+        addElement(RED_HOLE, MapElement.RED_HOLE_INDEX);
 
         charsToStrength.put('0', 0);
         charsToStrength.put('1', 1);
@@ -81,6 +61,12 @@ final class LevelParser {
         charsToBasement.put(TRIGGER_1_CHAR, MapElement.TRIGGER_1_INDEX);
         charsToBasement.put(TRIGGER_2_CHAR,  MapElement.TRIGGER_2_INDEX);
     }
+    
+    private void addElement(char character, byte index) {
+        charsToElements.put(character, index);
+        elementsToChars.put(index, character);
+    }
+    
 
     @NotNull Level readLevel(@NotNull String[] elements, @NotNull String[] strengths) {
         int linesNumber = elements.length;

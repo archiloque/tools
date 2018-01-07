@@ -1,6 +1,7 @@
 package net.archiloque.roofbot;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -64,40 +65,138 @@ final class MapState {
         }
     }
 
-    private boolean canGo(int targetPosition) {
-        if (gridStrengths[targetPosition] == 0) {
-            return false;
-        }
-        byte targetPositionContent = level.gridElements[targetPosition];
-        if (currentObject == MapElement.EMPTY_INDEX) {
-            return MapElement.CAN_GO_HOLDING_NOTHING[targetPositionContent];
-        } else {
-            if (MapElement.CAN_GO_HOLDING_SOMETHING[targetPositionContent]) {
-                return
-                        MapElement.CAN_WALK_FREELY[targetPositionContent] ||
-                                MapElement.HOLE_FOR_ELEMENT[targetPositionContent] == currentObject;
-            } else {
-                return false;
-            }
-        }
-    }
-
-    private @NotNull MapState createMapState(
+    private @Nullable MapState tryToGo(
+            byte direction,
             int targetPosition,
             int targetColumn,
             int targetLine
     ) {
-        int[] targetGridStrengths = gridStrengths.clone();
-        targetGridStrengths[targetPosition]--;
-        byte targetCurrentObject = currentObject;
+        return tryToGo(
+                direction,
+                targetPosition,
+                targetColumn,
+                targetLine,
+                gridStrengths.clone(),
+                currentObject,
+                numberOfUnfilledElements,
+                path
+        );
+    }
+
+    private @Nullable MapState tryToGoFan(
+            byte direction,
+            int targetPosition,
+            int targetColumn,
+            int targetLine,
+            int[] targetGridStrengths,
+            byte targetCurrentObject,
+            int targetNumberOfUnfilledElements,
+            CoordinatesLinkedItem path
+    ){
+        switch (direction) {
+            case Direction.UP: {
+                if (targetLine == 0) {
+                    return null;
+                } else {
+                    return tryToGo(
+                            direction,
+                            targetPosition - level.width,
+                            targetColumn,
+                            targetLine - 1,
+                            targetGridStrengths,
+                            targetCurrentObject,
+                            targetNumberOfUnfilledElements,
+                            new CoordinatesLinkedItem(targetLine, targetColumn, path)
+                    );
+                }
+            }
+            case Direction.DOWN:
+                if (targetLine == (level.height - 1)) {
+                    return null;
+                } else {
+                    return tryToGo(
+                            direction,
+                            targetPosition + level.width,
+                            targetColumn,
+                            targetLine + 1,
+                            targetGridStrengths,
+                            targetCurrentObject,
+                            targetNumberOfUnfilledElements,
+                            new CoordinatesLinkedItem(targetLine, targetColumn, path)
+                    );
+                }
+            case Direction.LEFT:
+                if (targetColumn == 0) {
+                    return null;
+                } else {
+                    return tryToGo(
+                            direction,
+                            targetPosition - 1,
+                            targetColumn - 1,
+                            targetLine,
+                            targetGridStrengths,
+                            targetCurrentObject,
+                            targetNumberOfUnfilledElements,
+                            new CoordinatesLinkedItem(targetLine, targetColumn, path)
+                    );
+                }
+            case Direction.RIGHT:
+                if (targetColumn == (level.width - 1)) {
+                    return null;
+                } else {
+                    return tryToGo(
+                            direction,
+                            targetPosition + 1,
+                            targetColumn + 1,
+                            targetLine,
+                            targetGridStrengths,
+                            targetCurrentObject,
+                            targetNumberOfUnfilledElements,
+                            new CoordinatesLinkedItem(targetLine, targetColumn, path)
+                    );
+                }
+                default:
+                    throw new RuntimeException("Unknown direction " + direction);
+        }
+    }
+
+
+    private @Nullable MapState tryToGo(
+            byte direction,
+            int targetPosition,
+            int targetColumn,
+            int targetLine,
+            int[] targetGridStrengths,
+            byte targetCurrentObject,
+            int targetNumberOfUnfilledElements,
+            CoordinatesLinkedItem path
+    ) {
+        if (targetGridStrengths[targetPosition] == 0) {
+            return null;
+        }
         byte targetPositionContent = level.gridElements[targetPosition];
-        int targetNumberOfUnfilledElements = numberOfUnfilledElements;
-        if (currentObject == MapElement.EMPTY_INDEX) {
+        if (targetCurrentObject == MapElement.EMPTY_INDEX) {
+            if (!MapElement.CAN_GO_HOLDING_NOTHING[targetPositionContent]) {
+                return null;
+            }
+        } else {
+            if (MapElement.CAN_GO_HOLDING_SOMETHING[targetPositionContent]) {
+                if (!(
+                        MapElement.CAN_WALK_FREELY[targetPositionContent] ||
+                                MapElement.HOLE_FOR_ELEMENT[targetPositionContent] == currentObject)) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        }
+        targetGridStrengths[targetPosition]--;
+        if (targetCurrentObject == MapElement.EMPTY_INDEX) {
             if (MapElement.CAN_BE_PICKED[targetPositionContent]) {
                 targetCurrentObject = targetPositionContent;
             }
         } else {
-            if (MapElement.HOLE_FOR_ELEMENT[targetPositionContent] == currentObject) {
+            if (MapElement.HOLE_FOR_ELEMENT[targetPositionContent] == targetCurrentObject) {
                 targetCurrentObject = MapElement.EMPTY_INDEX;
                 targetNumberOfUnfilledElements--;
             }
@@ -106,6 +205,16 @@ final class MapState {
             for (Integer basementTile : level.basementTiles[targetPositionContent]) {
                 targetGridStrengths[basementTile] = 1;
             }
+        } else if (targetPositionContent == MapElement.FAN_INDEX) {
+            return tryToGoFan(
+                    direction,
+                    targetPosition,
+                    targetColumn,
+                    targetLine,
+                    targetGridStrengths,
+                    targetCurrentObject,
+                    targetNumberOfUnfilledElements,
+                    path);
         }
         return new MapState(
                 level,
@@ -119,40 +228,41 @@ final class MapState {
         );
     }
 
+
     private void addAvailableDirections(@NotNull LinkedList<MapState> nextStates) {
         // checkPathForDebug();
         {
             // up
             boolean isFirstLine = (playerLine == 0);
-            int targetPositionUp = playerPosition - level.width;
-            if ((!isFirstLine) && canGo(targetPositionUp)) {
-                nextStates.add(createMapState(targetPositionUp, playerColumn, playerLine - 1));
+            if ((!isFirstLine)) {
+                int targetPositionUp = playerPosition - level.width;
+                nextStates.add(tryToGo(Direction.UP, targetPositionUp, playerColumn, playerLine - 1));
             }
         }
         {
             // down
             boolean isLastLine = (playerLine == (level.height - 1));
-            int targetPositionDown = playerPosition + level.width;
-            if ((!isLastLine) && canGo(targetPositionDown)) {
-                nextStates.add(createMapState(targetPositionDown, playerColumn, playerLine + 1));
+            if ((!isLastLine)) {
+                int targetPositionDown = playerPosition + level.width;
+                nextStates.add(tryToGo(Direction.DOWN, targetPositionDown, playerColumn, playerLine + 1));
             }
 
         }
         {
             // left
             boolean isFirstColumn = (playerColumn == 0);
-            int targetPositionLeft = playerPosition - 1;
-            if ((!isFirstColumn) && canGo(targetPositionLeft)) {
-                nextStates.add(createMapState(targetPositionLeft, playerColumn - 1, playerLine));
+            if ((!isFirstColumn)) {
+                int targetPositionLeft = playerPosition - 1;
+                nextStates.add(tryToGo(Direction.LEFT, targetPositionLeft, playerColumn - 1, playerLine));
             }
 
         }
         {
             // right
             boolean isLastColumn = (playerColumn == (level.width - 1));
-            int targetPositionRight = playerPosition + 1;
-            if ((!isLastColumn) && canGo(targetPositionRight)) {
-                nextStates.add(createMapState(targetPositionRight, playerColumn + 1, playerLine));
+            if ((!isLastColumn)) {
+                int targetPositionRight = playerPosition + 1;
+                nextStates.add(tryToGo(Direction.RIGHT, targetPositionRight, playerColumn + 1, playerLine));
             }
 
         }
