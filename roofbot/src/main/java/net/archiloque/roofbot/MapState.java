@@ -92,7 +92,7 @@ final class MapState {
             byte targetCurrentObject,
             int targetNumberOfUnfilledElements,
             CoordinatesLinkedItem path
-    ){
+    ) {
         switch (direction) {
             case Direction.UP: {
                 if (targetLine == 0) {
@@ -155,8 +155,8 @@ final class MapState {
                             new CoordinatesLinkedItem(targetLine, targetColumn, path)
                     );
                 }
-                default:
-                    throw new RuntimeException("Unknown direction " + direction);
+            default:
+                throw new RuntimeException("Unknown direction " + direction);
         }
     }
 
@@ -323,7 +323,9 @@ final class MapState {
             } else if (toColumn == (fromColumn + 1)) {
                 direction = Direction.RIGHT;
             }
-            result[i] = coordinates.toString() + ((direction == -1) ? "" : (" " + Direction.toKey(direction)));
+            result[i] =
+                    coordinates.toString() +
+                            (((direction == -1) || (level.gridElements[fromLine * level.width + fromColumn] == MapElement.FAN_INDEX)) ? "" : (" " + Direction.toKey(direction)));
 
             fromLine = coordinates.line;
             fromColumn = coordinates.column;
