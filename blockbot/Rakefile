@@ -1,0 +1,29 @@
+require 'rake/testtask'
+
+Rake::TestTask.new do |t|
+  t.libs << 'test'
+  t.pattern = 'test/**/*_test.rb'
+end
+
+desc 'Run tests'
+task :default => :test
+
+task :generate do
+  require_relative 'generation/generator'
+  require_relative 'generation/translator'
+  require_relative 'magica_voxel/renderer'
+  world = Generation::Generator.new.generate
+  document = Generation::Translator.new.translate(world)
+  IO.write('blockbot.json', JSON.pretty_generate(document))
+  rendered_content = MagicaVoxel::Renderer.new(document).render
+  IO.binwrite('blockbot.vox', rendered_content)
+  p 'File generated at [blockbot.vox]'
+end
+
+task :to_json, [:file_path] do |t, args|
+  file_path = args[:file_path]
+  require_relative 'magica_voxel/parser'
+  parser = MagicaVoxel::Parser.new(IO.binread(file_path))
+  document = parser.parse
+  IO.write("#{file_path}.json", JSON.pretty_generate(document))
+end

@@ -1,0 +1,19 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    asciidoctor (1.5.6.1)
+    curb (0.9.4)
+    mini_portile2 (2.3.0)
+    nokogiri (1.8.2)
+      mini_portile2 (~> 2.3.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  asciidoctor (~> 1.5.6.1)
+  curb (~> 0.9.4)
+  nokogiri (~> 1.8.2)
+
+BUNDLED WITH
+   1.14.3
