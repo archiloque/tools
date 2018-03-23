@@ -10,12 +10,12 @@ final class MapState {
     /**
      * Used for debugging.
      */
-    static Coordinates[] PATH_TO_CHECK = null;
+    private static Coordinates[] PATH_TO_CHECK = null;
 
     /**
      * Used for debugging.
      */
-    static int MAX_COMMON_PATH_LENGTH = 0;
+    private static int MAX_COMMON_PATH_LENGTH = 0;
 
     /**
      * Current Level.
@@ -336,17 +336,17 @@ final class MapState {
 
             int direction = -1;
 
-            if (toLine == (fromLine + 1)) {
+            if ((toLine == (fromLine + 1)) && (toColumn == fromColumn)) {
                 direction = Direction.DOWN;
-            } else if (toLine == (fromLine - 1)) {
+            } else if ((toLine == (fromLine - 1)) && (toColumn == fromColumn)) {
                 direction = Direction.UP;
-            } else if (toColumn == (fromColumn - 1)) {
+            } else if ((fromLine == toLine) && (toColumn == (fromColumn - 1))) {
                 direction = Direction.LEFT;
-            } else if (toColumn == (fromColumn + 1)) {
+            } else if ((fromLine == toLine) && (toColumn == (fromColumn + 1))) {
                 direction = Direction.RIGHT;
             }
             result[i] =
-                    coordinates.toString() +
+                    coordinates.toString() + 
                             (((direction == -1) || (level.gridElements[fromLine * level.width + fromColumn] == MapElement.FAN_INDEX)) ? "" : (" " + Direction.toKey(direction)));
 
             fromLine = coordinates.line;
