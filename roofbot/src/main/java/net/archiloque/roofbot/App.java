@@ -15,9 +15,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class App {
 
@@ -41,7 +39,7 @@ public class App {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 if (matcher.matches(file)) {
                     try {
-                        processFile(file);
+                        processProblem(file);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -52,18 +50,19 @@ public class App {
 
     }
 
-    private static void processFile(Path problemsFile) throws IOException {
-        String fileName = problemsFile.getFileName().toString();
-        System.out.println("Reading problem from [" + problemsFile.toAbsolutePath() + "]");
-        LevelFileParser levelFileParser = new LevelFileParser();
-        Level level = levelFileParser.parseFile(problemsFile);
-        String problemName = fileName.substring(0, fileName.length() - 4);
-        try (BufferedWriter resultWriter = Files.newBufferedWriter(Paths.get("solutions/" + problemName + ".txt"))) {
-            printWithTimestamp(problemName, "Init level");
-            List<MapState> mapStates = new ArrayList<>();
-            mapStates.add(level.createMapState());
-            if (mapStates.size() == 1) {
-                solveProblem(problemName, mapStates.get(0), resultWriter);
+    private static void processProblem(Path problemsFile) throws IOException {
+        String problemFileName = problemsFile.getFileName().toString();
+        String problemName = problemFileName.substring(0, problemFileName.length() - 4);
+        Path solutionPath = Paths.get("solutions/" + problemName + ".txt");
+        if (Files.exists(solutionPath)) {
+            System.out.println("Problem from [" + problemsFile.toAbsolutePath() + "] already solved");
+        } else {
+            System.out.println("Reading problem from [" + problemsFile.toAbsolutePath() + "]");
+            LevelFileParser levelFileParser = new LevelFileParser();
+            Level level = levelFileParser.parseFile(problemsFile);
+            try (BufferedWriter resultWriter = Files.newBufferedWriter(solutionPath)) {
+                printWithTimestamp(problemName, "Init level");
+                solveProblem(problemName, level.createMapState(), resultWriter);
             }
         }
     }

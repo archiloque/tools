@@ -11,9 +11,10 @@ final class MapElement {
     final static byte EXIT_INDEX = ENTRY_INDEX + 1;
 
     final static byte FAN_INDEX = EXIT_INDEX + 1;
-    final static byte TELEPORTER_INDEX = FAN_INDEX + 1;
+    final static byte TELEPORTER_1_INDEX = FAN_INDEX + 1;
+    final static byte TELEPORTER_2_INDEX = TELEPORTER_1_INDEX + 1;
 
-    final static byte TRIGGER_1_INDEX = TELEPORTER_INDEX + 1;
+    final static byte TRIGGER_1_INDEX = TELEPORTER_2_INDEX + 1;
     final static byte TRIGGER_2_INDEX = TRIGGER_1_INDEX + 1;
 
     final static byte GREEN_OBJECT_INDEX = TRIGGER_2_INDEX + 1;
@@ -65,7 +66,8 @@ final class MapElement {
         setValues(ENTRY_INDEX, false, false, EMPTY_INDEX, false, false, false);
         setValues(EXIT_INDEX, true, false, EMPTY_INDEX, false, false, false);
         setValues(FAN_INDEX, true, true, EMPTY_INDEX, false, true, false);
-        setValues(TELEPORTER_INDEX, true, true, EMPTY_INDEX, false, true, false);
+        setValues(TELEPORTER_1_INDEX, true, true, EMPTY_INDEX, false, true, false);
+        setValues(TELEPORTER_2_INDEX, true, true, EMPTY_INDEX, false, true, false);
 
         setValues(TRIGGER_1_INDEX, true, true, EMPTY_INDEX, false, true, true);
         setValues(TRIGGER_2_INDEX, true, true, EMPTY_INDEX, false, true, true);

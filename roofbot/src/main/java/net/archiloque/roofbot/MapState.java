@@ -215,15 +215,37 @@ final class MapState {
                     targetCurrentObject,
                     targetNumberOfUnfilledElements,
                     path);
-        } else if(
-                (targetPositionContent == MapElement.TELEPORTER_INDEX) &&
+        } else if (
+                (targetPositionContent == MapElement.TELEPORTER_1_INDEX) &&
                         (direction != Direction.TELEPORT)
                 ) {
             Coordinates currentCoordinates = new Coordinates(targetLine, targetColumn);
             Coordinates teleporterExit = level.
-                    teleportersTiles.
+                    teleporters1Tiles.
                     stream().
-                    filter(tc -> ! tc.equals(currentCoordinates)).
+                    filter(tc -> !tc.equals(currentCoordinates)).
+                    findFirst().
+                    get();
+            return tryToGo(
+                    Direction.TELEPORT,
+                    teleporterExit.line * level.width + teleporterExit.column,
+                    teleporterExit.column,
+                    teleporterExit.line,
+                    targetGridStrengths,
+                    targetCurrentObject,
+                    targetNumberOfUnfilledElements,
+                    new CoordinatesLinkedItem(targetLine, targetColumn, path)
+            );
+
+        } else if (
+                (targetPositionContent == MapElement.TELEPORTER_2_INDEX) &&
+                        (direction != Direction.TELEPORT)
+                ) {
+            Coordinates currentCoordinates = new Coordinates(targetLine, targetColumn);
+            Coordinates teleporterExit = level.
+                    teleporters2Tiles.
+                    stream().
+                    filter(tc -> !tc.equals(currentCoordinates)).
                     findFirst().
                     get();
             return tryToGo(
@@ -346,7 +368,7 @@ final class MapState {
                 direction = Direction.RIGHT;
             }
             result[i] =
-                    coordinates.toString() + 
+                    coordinates.toString() +
                             (((direction == -1) || (level.gridElements[fromLine * level.width + fromColumn] == MapElement.FAN_INDEX)) ? "" : (" " + Direction.toKey(direction)));
 
             fromLine = coordinates.line;

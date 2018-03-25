@@ -12,7 +12,9 @@ final class LevelParser {
     private static final char EMPTY_CHAR = 'X';
     private static final char VOID_CHAR = '0';
     private static final char FAN_CHAR = 'F';
-    private static final char TELPORTER_CHAR = 'T';
+
+    private static final char TELPORTER_1_CHAR = 'T';
+    private static final char TELPORTER_2_CHAR = 'U';
     
     private static final char TRIGGER_1_CHAR = '⊤';
     private static final char TRIGGER_2_CHAR = '⊥';
@@ -40,7 +42,8 @@ final class LevelParser {
         addElement(EMPTY_CHAR, MapElement.EMPTY_INDEX);
         addElement(VOID_CHAR, MapElement.VOID_INDEX);
         addElement(FAN_CHAR, MapElement.FAN_INDEX);
-        addElement(TELPORTER_CHAR, MapElement.TELEPORTER_INDEX);
+        addElement(TELPORTER_1_CHAR, MapElement.TELEPORTER_1_INDEX);
+        addElement(TELPORTER_2_CHAR, MapElement.TELEPORTER_2_INDEX);
         
         addElement(TRIGGER_1_CHAR, MapElement.TRIGGER_1_INDEX);
         addElement(TRIGGER_2_CHAR, MapElement.TRIGGER_2_INDEX);
@@ -117,6 +120,8 @@ final class LevelParser {
                 }
             }
         }
+
+        level.validate(this);
 
         return level;
     }
