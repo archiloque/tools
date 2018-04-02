@@ -238,13 +238,70 @@ final class MapState {
 
     private void addAvailableDirections() {
         // checkPathForDebug();
-        int[] possibleDirections = level.possibleDirections[playerPosition];
-        for (int i = 0; i < 4; i++) {
-            int possiblePosition = possibleDirections[i];
-            if (possiblePosition != -1) {
+        {
+            // up
+            boolean isFirstLine = playerPosition < level.width;
+            if ((!isFirstLine)) {
+                int targetPositionUp = playerPosition - level.width;
                 MapState mapState = tryToGo(
-                        DIRECTIONS[i],
-                        possiblePosition,
+                        Direction.UP,
+                        targetPositionUp,
+                        null,
+                        currentObject,
+                        numberOfUnfilledElements,
+                        path
+                );
+                if (mapState != null) {
+                    level.addMapState(mapState);
+                }
+            }
+        }
+        {
+            // down
+            boolean isLastLine = ((playerPosition / level.width) == (level.height - 1));
+            if ((!isLastLine)) {
+                int targetPositionDown = playerPosition + level.width;
+                MapState mapState = tryToGo(
+                        Direction.DOWN,
+                        targetPositionDown,
+                        null,
+                        currentObject,
+                        numberOfUnfilledElements,
+                        path
+                );
+                if (mapState != null) {
+                    level.addMapState(mapState);
+                }
+            }
+
+        }
+        {
+            // left
+            boolean isFirstColumn = ((playerPosition % level.width) == 0);
+            if ((!isFirstColumn)) {
+                int targetPositionLeft = playerPosition - 1;
+                MapState mapState = tryToGo(
+                        Direction.LEFT,
+                        targetPositionLeft,
+                        null,
+                        currentObject,
+                        numberOfUnfilledElements,
+                        path
+                );
+                if (mapState != null) {
+                    level.addMapState(mapState);
+                }
+            }
+
+        }
+        {
+            // right
+            boolean isLastColumn = ((playerPosition % level.width) == (level.width - 1));
+            if ((!isLastColumn)) {
+                int targetPositionRight = playerPosition + 1;
+                MapState mapState = tryToGo(
+                        Direction.RIGHT,
+                        targetPositionRight,
                         null,
                         currentObject,
                         numberOfUnfilledElements,

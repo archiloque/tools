@@ -43,7 +43,6 @@ final class Level {
     private final List<Coordinates> teleporters1Tiles = new ArrayList<>();
     private final List<Coordinates> teleporters2Tiles = new ArrayList<>();
     final Map<Integer, Coordinates> teleporters = new HashMap<>();
-    final int[][] possibleDirections;
 
     private static final byte[] SHOULD_HAVE_ONE = new byte[]{
             MapElement.ENTRY_INDEX,
@@ -71,7 +70,6 @@ final class Level {
         Arrays.fill(gridStrengths, (byte) 0);
         basementTiles = new ArrayList[MapElement.NUMBER_OF_ELEMENTS];
         mapStates = new MapState[height * width * 4];
-        possibleDirections = new int[height * width][];
     }
 
     void validate(LevelParser levelParser) {
@@ -190,33 +188,6 @@ final class Level {
                 new CoordinatesLinkedItem(entryPosition, null)
         );
         addMapState(mapState);
-        for (int line = 0; line < height; line++) {
-            for (int column = 0; column < width; column++) {
-                int index = (line * width) + column;
-                int[] currentPossibleDirections = new int[4];
-                if (line != 0) {
-                    currentPossibleDirections[0] = index - width;
-                } else {
-                    currentPossibleDirections[0] = -1;
-                }
-                if (line != (height - 1)) {
-                    currentPossibleDirections[1] = index + width;
-                } else {
-                    currentPossibleDirections[1] = -1;
-                }
-                if (column != 0) {
-                    currentPossibleDirections[2] = index - 1;
-                } else {
-                    currentPossibleDirections[2] = -1;
-                }
-                if (column != (width - 1)) {
-                    currentPossibleDirections[3] = index + 1;
-                } else {
-                    currentPossibleDirections[3] = -1;
-                }
-                possibleDirections[index] = currentPossibleDirections;
-            }
-        }
     }
 
     void addMapState(MapState mapState) {
