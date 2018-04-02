@@ -12,15 +12,12 @@ import java.util.List;
  */
 final class CoordinatesLinkedItem {
 
-    private final int line;
-
-    private final int column;
+    private final int coordinates;
 
     private final @Nullable CoordinatesLinkedItem previous;
 
-    CoordinatesLinkedItem(int line, int column, @Nullable CoordinatesLinkedItem previous) {
-        this.line = line;
-        this.column = column;
+    CoordinatesLinkedItem(int coordinates, @Nullable CoordinatesLinkedItem previous) {
+        this.coordinates = coordinates;
         this.previous = previous;
     }
 
@@ -29,7 +26,9 @@ final class CoordinatesLinkedItem {
 
         CoordinatesLinkedItem trainPath = this;
         while (trainPath != null) {
-            trainPathList.add(new Coordinates(trainPath.line, trainPath.column));
+            byte line = (byte) (trainPath.coordinates / level.width);
+            byte column = (byte) (trainPath.coordinates % level.width);
+            trainPathList.add( new Coordinates(line, column));
             trainPath = trainPath.previous;
         }
         Collections.reverse(trainPathList);
@@ -37,6 +36,6 @@ final class CoordinatesLinkedItem {
     }
 
     public String toString() {
-        return " (" + line + ", " + column + ")";
+        return Integer.toString(coordinates);
     }
 }

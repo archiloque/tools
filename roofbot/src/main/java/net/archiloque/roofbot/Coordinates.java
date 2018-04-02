@@ -2,11 +2,11 @@ package net.archiloque.roofbot;
 
 final class Coordinates {
 
-    final int line;
+    final byte line;
 
-    final int column;
+    final byte column;
 
-    Coordinates(int line, int column) {
+    Coordinates(byte line, byte column) {
         this.line = line;
         this.column = column;
     }

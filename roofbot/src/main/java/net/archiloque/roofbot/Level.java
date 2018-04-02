@@ -22,27 +22,32 @@ final class Level {
     /**
      * Contains MapElements.
      */
-    final int[] gridStrengths;
+    final byte[] gridStrengths;
 
-    int entryLine;
+    byte entryLine;
 
-    int entryColumn;
+    byte entryColumn;
 
     int exitLine;
 
     int exitColumn;
 
-    private int numberOfElements = 0;
+    private byte numberOfElements = 0;
 
     final List<Integer>[] basementTiles;
 
-    final List<Coordinates> teleporters1Tiles = new ArrayList<>();
-    final List<Coordinates> teleporters2Tiles = new ArrayList<>();
+    private final MapState[] mapStates;
+
+    private int mapStateNumber = 0;
+
+    private final List<Coordinates> teleporters1Tiles = new ArrayList<>();
+    private final List<Coordinates> teleporters2Tiles = new ArrayList<>();
+    final Map<Integer, Coordinates> teleporters = new HashMap<>();
+    final int[][] possibleDirections;
 
     private static final byte[] SHOULD_HAVE_ONE = new byte[]{
             MapElement.ENTRY_INDEX,
             MapElement.EXIT_INDEX,
-
     };
 
     private static final byte[] SHOULD_HAVE_ZERO_OR_TWO = new byte[]{
@@ -54,7 +59,7 @@ final class Level {
             new byte[]{MapElement.GREEN_OBJECT_INDEX, MapElement.GREEN_HOLE_INDEX},
             new byte[]{MapElement.BLUE_OBJECT_INDEX, MapElement.BLUE_HOLE_INDEX},
             new byte[]{MapElement.YELLOW_OBJECT_INDEX, MapElement.YELLOW_HOLE_INDEX},
-            new byte[]{MapElement.RED_OBJECT_INDEX, MapElement.RED_HOLE_INDEX}
+            new byte[]{MapElement.RED_OBJECT_INDEX, MapElement.RED_HOLE_INDEX},
     };
 
     Level(int height, int width) {
@@ -62,9 +67,11 @@ final class Level {
         this.width = width;
         gridElements = new byte[height * width];
         Arrays.fill(gridElements, MapElement.EMPTY_INDEX);
-        gridStrengths = new int[height * width];
-        Arrays.fill(gridStrengths, 0);
+        gridStrengths = new byte[height * width];
+        Arrays.fill(gridStrengths, (byte) 0);
         basementTiles = new ArrayList[MapElement.NUMBER_OF_ELEMENTS];
+        mapStates = new MapState[height * width * 4];
+        possibleDirections = new int[height * width][];
     }
 
     void validate(LevelParser levelParser) {
@@ -85,7 +92,19 @@ final class Level {
         for (byte[] b : SHOULD_HAVE_SAME_NUMBER) {
             shouldHaveSameNumber(frequencies, b[0], b[1], levelParser);
         }
+        processTeleportersTiles(teleporters1Tiles);
+        processTeleportersTiles(teleporters2Tiles);
+    }
 
+    private void processTeleportersTiles(List<Coordinates> teleportersTilesList) {
+        if (!teleportersTilesList.isEmpty()) {
+            Coordinates from = teleportersTilesList.get(0);
+            Coordinates to = teleportersTilesList.get(1);
+            Integer fromInteger = (from.line * width) + from.column;
+            Integer toInteger = (to.line * width) + to.column;
+            teleporters.put(fromInteger, to);
+            teleporters.put(toInteger, from);
+        }
     }
 
     private void shouldHaveOne(Map<Byte, Integer> frequencies, byte element, LevelParser levelParser) {
@@ -113,8 +132,8 @@ final class Level {
             if (frequencies.containsKey(element2)) {
                 throw new RuntimeException("Element [" + levelParser.elementsToChars.get(element1) + "] and [" + levelParser.elementsToChars.get(element2) + "] have not the same frequency");
             }
-        }
-        if (!frequencies.containsKey(element2)) {
+            return;
+        } else if (!frequencies.containsKey(element2)) {
             throw new RuntimeException("Element [" + levelParser.elementsToChars.get(element1) + "] and [" + levelParser.elementsToChars.get(element2) + "] have not the same frequency");
         }
 
@@ -125,7 +144,7 @@ final class Level {
         }
     }
 
-    void setElement(byte mapElement, int line, int column) {
+    void setElement(byte mapElement, byte line, byte column) {
         gridElements[(line * width) + column] = mapElement;
         if (mapElement == MapElement.ENTRY_INDEX) {
             entryLine = line;
@@ -143,11 +162,11 @@ final class Level {
         }
     }
 
-    void setStrength(int strength, int line, int column) {
+    void setStrength(byte strength, int line, int column) {
         gridStrengths[(line * width) + column] = strength;
     }
 
-    void setBasement(byte basementType, int line, int column) {
+    void setBasement(int basementType, int line, int column) {
         List<Integer> currentBasementTiles = basementTiles[basementType];
         if (currentBasementTiles == null) {
             currentBasementTiles = new ArrayList<>();
@@ -157,21 +176,63 @@ final class Level {
     }
 
 
-    @NotNull MapState createMapState() {
+    void prepare() {
         int entryPosition = entryLine * width + entryColumn;
-        int[] initialGridStrengths = gridStrengths.clone();
+        byte[] initialGridStrengths = gridStrengths.clone();
         initialGridStrengths[entryPosition]--;
 
-        return new MapState(
+        MapState mapState = new MapState(
                 this,
                 entryPosition,
-                entryLine,
-                entryColumn,
                 MapElement.EMPTY_INDEX,
                 initialGridStrengths,
                 numberOfElements,
-                new CoordinatesLinkedItem(entryLine, entryColumn, null)
+                new CoordinatesLinkedItem(entryPosition, null)
         );
+        addMapState(mapState);
+        for (int line = 0; line < height; line++) {
+            for (int column = 0; column < width; column++) {
+                int index = (line * width) + column;
+                int[] currentPossibleDirections = new int[4];
+                if (line != 0) {
+                    currentPossibleDirections[0] = index - width;
+                } else {
+                    currentPossibleDirections[0] = -1;
+                }
+                if (line != (height - 1)) {
+                    currentPossibleDirections[1] = index + width;
+                } else {
+                    currentPossibleDirections[1] = -1;
+                }
+                if (column != 0) {
+                    currentPossibleDirections[2] = index - 1;
+                } else {
+                    currentPossibleDirections[2] = -1;
+                }
+                if (column != (width - 1)) {
+                    currentPossibleDirections[3] = index + 1;
+                } else {
+                    currentPossibleDirections[3] = -1;
+                }
+                possibleDirections[index] = currentPossibleDirections;
+            }
+        }
+    }
+
+    void addMapState(MapState mapState) {
+        mapStates[mapStateNumber] = mapState;
+        mapStateNumber++;
+    }
+
+    boolean hasMapStates() {
+        return mapStateNumber != 0;
+    }
+
+    @NotNull MapState popState() {
+        MapState mapState = mapStates[mapStateNumber - 1];
+        mapStates[mapStateNumber - 1] = null;
+        mapStateNumber--;
+        return mapState;
     }
 
 

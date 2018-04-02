@@ -32,7 +32,7 @@ final class LevelParser {
     private static final char RED_HOLE = 'r';
 
     private final @NotNull Map<Character, Byte> charsToElements = new HashMap<>();
-    private final @NotNull Map<Character, Integer> charsToStrength = new HashMap<>();
+    private final @NotNull Map<Character, Byte> charsToStrength = new HashMap<>();
     private final @NotNull Map<Character, Byte> charsToBasement = new HashMap<>();
     final @NotNull Map<Byte, Character> elementsToChars = new HashMap<>();
 
@@ -60,9 +60,9 @@ final class LevelParser {
         addElement(RED_OBJECT, MapElement.RED_OBJECT_INDEX);
         addElement(RED_HOLE, MapElement.RED_HOLE_INDEX);
 
-        charsToStrength.put('0', 0);
-        charsToStrength.put('1', 1);
-        charsToStrength.put('2', 2);
+        charsToStrength.put('0', (byte) 0);
+        charsToStrength.put('1', (byte) 1);
+        charsToStrength.put('2', (byte) 2);
         charsToBasement.put(TRIGGER_1_CHAR, MapElement.TRIGGER_1_INDEX);
         charsToBasement.put(TRIGGER_2_CHAR,  MapElement.TRIGGER_2_INDEX);
     }
@@ -82,12 +82,12 @@ final class LevelParser {
         }
 
         Level level = new Level(linesNumber, columnsNumber);
-        for (int lineIndex = 0; lineIndex < elements.length; lineIndex++) {
+        for (byte lineIndex = 0; lineIndex < elements.length; lineIndex++) {
             String line = elements[lineIndex];
             if (line.length() != columnsNumber) {
                 throw new RuntimeException("Line " + lineIndex + " with content [" + line + "] is " + line.length() + " instead of " + columnsNumber + " like the first line");
             }
-            for (int columnIndex = 0; columnIndex < columnsNumber; columnIndex++) {
+            for (byte columnIndex = 0; columnIndex < columnsNumber; columnIndex++) {
                 Character elementChar = line.charAt(columnIndex);
                 Byte elementElement = charsToElements.get(elementChar);
                 if (elementElement != null) {
@@ -105,7 +105,7 @@ final class LevelParser {
             }
             for (int columnIndex = 0; columnIndex < columnsNumber; columnIndex++) {
                 Character elementChar = line.charAt(columnIndex);
-                Integer elementStrength = charsToStrength.get(elementChar);
+                Byte elementStrength = charsToStrength.get(elementChar);
                 if (elementStrength != null) {
                     level.setStrength(elementStrength, lineIndex, columnIndex);
                 } else {

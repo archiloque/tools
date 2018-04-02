@@ -60,25 +60,23 @@ public class App {
             System.out.println("Reading problem from [" + problemsFile.toAbsolutePath() + "]");
             LevelFileParser levelFileParser = new LevelFileParser();
             Level level = levelFileParser.parseFile(problemsFile);
+            level.prepare();
             try (BufferedWriter resultWriter = Files.newBufferedWriter(solutionPath)) {
                 printWithTimestamp(problemName, "Init level");
-                solveProblem(problemName, level.createMapState(), resultWriter);
+                solveProblem(problemName, resultWriter, level);
             }
         }
     }
 
     private static void solveProblem(@NotNull String problemName,
-                                     @NotNull MapState mapState,
-                                     @NotNull BufferedWriter resultWriter) throws IOException {
+                                     @NotNull BufferedWriter resultWriter,
+                                     @NotNull Level level) throws IOException {
         printWithTimestamp(problemName, "Calculating problem");
         long startTime = System.nanoTime();
-
-        LinkedList<MapState> states = new LinkedList<>();
-        states.add(mapState);
         boolean solution = false;
-        while ((!solution) && (!states.isEmpty())) {
-            MapState nextCandidate = states.pop();
-            solution = nextCandidate.processState(states);
+        while ((!solution) && (level.hasMapStates())) {
+            MapState nextCandidate = level.popState();
+            solution = nextCandidate.processState();
             if (solution) {
                 long stopTime = System.nanoTime();
                 printWithTimestamp(problemName, "Solved in " + LocalTime.MIN.plusNanos((stopTime - startTime)).toString());
@@ -87,7 +85,9 @@ public class App {
                     resultWriter.write(solutionLine);
                     resultWriter.newLine();
                 }
+
                 resultWriter.newLine();
+
                 String[] pathAsStringArray = nextCandidate.printablePath();
                 for (String solutionLine : pathAsStringArray) {
                     resultWriter.write(solutionLine);
