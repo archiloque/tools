@@ -35,43 +35,53 @@ class MapElement {
             YELLOW_HOLE_INDEX,
             RED_HOLE_INDEX
     );
+    final static boolean[] CAN_GO = new boolean[NUMBER_OF_ELEMENTS*NUMBER_OF_ELEMENTS];
 
-    final static boolean[] CAN_GO_HOLDING_NOTHING = new boolean[NUMBER_OF_ELEMENTS];
-    final static byte[] HOLE_FOR_ELEMENT = new byte[NUMBER_OF_ELEMENTS];
-    final static boolean[] CAN_WALK_FREELY = new boolean[NUMBER_OF_ELEMENTS];
-
-    private static void setValues(int index,
-                                  boolean canGoHoldingNothing,
-                                  byte holeForElement,
-                                  boolean canWalkFreely) {
-        CAN_GO_HOLDING_NOTHING[index] = canGoHoldingNothing;
-        HOLE_FOR_ELEMENT[index] = holeForElement;
-        CAN_WALK_FREELY[index] = canWalkFreely;
+    private static void cantGoWithObject(byte index) {
+        CAN_GO[GREEN_OBJECT_INDEX* NUMBER_OF_ELEMENTS + index] = false;
+        CAN_GO[BLUE_OBJECT_INDEX* NUMBER_OF_ELEMENTS + index] = false;
+        CAN_GO[YELLOW_OBJECT_INDEX* NUMBER_OF_ELEMENTS + index] = false;
+        CAN_GO[RED_HOLE_INDEX* NUMBER_OF_ELEMENTS + index] = false;
     }
 
     static {
-        setValues(EMPTY_INDEX, true, EMPTY_INDEX, true);
-        setValues(VOID_INDEX, false, EMPTY_INDEX, false);
-        setValues(ENTRY_INDEX, false, EMPTY_INDEX, false);
-        setValues(EXIT_INDEX, true, EMPTY_INDEX, false);
-        setValues(FAN_INDEX, true, EMPTY_INDEX, true);
-        setValues(TELEPORTER_1_INDEX, true, EMPTY_INDEX, true);
-        setValues(TELEPORTER_2_INDEX, true, EMPTY_INDEX, true);
+        Arrays.fill(CAN_GO, true);
+        CAN_GO[EMPTY_INDEX* NUMBER_OF_ELEMENTS + GREEN_HOLE_INDEX] = false;
+        CAN_GO[EMPTY_INDEX* NUMBER_OF_ELEMENTS + BLUE_HOLE_INDEX] = false;
+        CAN_GO[EMPTY_INDEX* NUMBER_OF_ELEMENTS + YELLOW_HOLE_INDEX] = false;
+        CAN_GO[EMPTY_INDEX* NUMBER_OF_ELEMENTS + RED_HOLE_INDEX] = false;
 
-        setValues(TRIGGER_1_INDEX, true, EMPTY_INDEX, true);
-        setValues(TRIGGER_2_INDEX, true, EMPTY_INDEX, true);
+        CAN_GO[GREEN_OBJECT_INDEX* NUMBER_OF_ELEMENTS + BLUE_HOLE_INDEX] = false;
+        CAN_GO[GREEN_OBJECT_INDEX* NUMBER_OF_ELEMENTS + YELLOW_HOLE_INDEX] = false;
+        CAN_GO[GREEN_OBJECT_INDEX* NUMBER_OF_ELEMENTS + RED_HOLE_INDEX] = false;
 
-        setValues(GREEN_OBJECT_INDEX, true, EMPTY_INDEX, false);
-        setValues(GREEN_HOLE_INDEX, false, GREEN_OBJECT_INDEX, false);
+        CAN_GO[BLUE_OBJECT_INDEX* NUMBER_OF_ELEMENTS + GREEN_HOLE_INDEX] = false;
+        CAN_GO[BLUE_OBJECT_INDEX* NUMBER_OF_ELEMENTS + YELLOW_HOLE_INDEX] = false;
+        CAN_GO[BLUE_OBJECT_INDEX* NUMBER_OF_ELEMENTS + RED_HOLE_INDEX] = false;
 
-        setValues(BLUE_OBJECT_INDEX, true, EMPTY_INDEX, false);
-        setValues(BLUE_HOLE_INDEX, false, BLUE_OBJECT_INDEX, false);
+        CAN_GO[YELLOW_OBJECT_INDEX* NUMBER_OF_ELEMENTS + GREEN_HOLE_INDEX] = false;
+        CAN_GO[YELLOW_OBJECT_INDEX* NUMBER_OF_ELEMENTS + BLUE_HOLE_INDEX] = false;
+        CAN_GO[YELLOW_OBJECT_INDEX* NUMBER_OF_ELEMENTS + RED_HOLE_INDEX] = false;
 
-        setValues(YELLOW_OBJECT_INDEX, true, EMPTY_INDEX, false);
-        setValues(YELLOW_HOLE_INDEX, false, YELLOW_OBJECT_INDEX, false);
+        CAN_GO[RED_OBJECT_INDEX* NUMBER_OF_ELEMENTS + GREEN_HOLE_INDEX] = false;
+        CAN_GO[RED_OBJECT_INDEX* NUMBER_OF_ELEMENTS + BLUE_HOLE_INDEX] = false;
+        CAN_GO[RED_OBJECT_INDEX* NUMBER_OF_ELEMENTS + YELLOW_HOLE_INDEX] = false;
 
-        setValues(RED_OBJECT_INDEX, true, EMPTY_INDEX, false);
-        setValues(RED_HOLE_INDEX, false, RED_OBJECT_INDEX, false);
+        cantGoWithObject(VOID_INDEX);
+        cantGoWithObject(ENTRY_INDEX);
+        cantGoWithObject(EXIT_INDEX);
+        cantGoWithObject(GREEN_OBJECT_INDEX);
+        cantGoWithObject(BLUE_OBJECT_INDEX);
+        cantGoWithObject(YELLOW_OBJECT_INDEX);
+        cantGoWithObject(RED_OBJECT_INDEX);
+
+        CAN_GO[EMPTY_INDEX* NUMBER_OF_ELEMENTS + VOID_INDEX] = false;
+        CAN_GO[EMPTY_INDEX* NUMBER_OF_ELEMENTS + ENTRY_INDEX] = false;
+
+        CAN_GO[GREEN_OBJECT_INDEX* NUMBER_OF_ELEMENTS + BLUE_HOLE_INDEX] = false;
+        CAN_GO[BLUE_OBJECT_INDEX* NUMBER_OF_ELEMENTS + YELLOW_HOLE_INDEX] = false;
+        CAN_GO[YELLOW_OBJECT_INDEX* NUMBER_OF_ELEMENTS + RED_HOLE_INDEX] = false;
+        CAN_GO[RED_HOLE_INDEX* NUMBER_OF_ELEMENTS + RED_HOLE_INDEX] = false;
     }
 
 

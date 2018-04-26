@@ -34,27 +34,34 @@ final class Level {
 
     private byte numberOfElements = 0;
 
-    final List<Integer>[] basementTiles;
+    /**
+     * List of tiles in the basement indexed by the type
+     */
+    final @NotNull List<Integer>[] basementTiles;
 
     private final MapState[] mapStates;
 
     private int mapStateNumber = 0;
 
-    private final List<Coordinates> teleporters1Tiles = new ArrayList<>();
-    private final List<Coordinates> teleporters2Tiles = new ArrayList<>();
-    final Map<Integer, Coordinates> teleporters = new HashMap<>();
+    private final @NotNull List<Coordinates> teleporters1Tiles = new ArrayList<>();
+    private final @NotNull List<Coordinates> teleporters2Tiles = new ArrayList<>();
+    final @NotNull Map<Integer, Coordinates> teleporters = new HashMap<>();
+    final @NotNull boolean[] canGoUp;
+    final @NotNull boolean[] canGoDown;
+    final @NotNull boolean[] canGoLeft;
+    final @NotNull boolean[] canGoRight;
 
-    private static final byte[] SHOULD_HAVE_ONE = new byte[]{
+    private static final @NotNull byte[] SHOULD_HAVE_ONE = new byte[]{
             MapElement.ENTRY_INDEX,
             MapElement.EXIT_INDEX,
     };
 
-    private static final byte[] SHOULD_HAVE_ZERO_OR_TWO = new byte[]{
+    private static final @NotNull byte[] SHOULD_HAVE_ZERO_OR_TWO = new byte[]{
             MapElement.TELEPORTER_1_INDEX,
             MapElement.TELEPORTER_2_INDEX,
     };
 
-    private static final byte[][] SHOULD_HAVE_SAME_NUMBER = new byte[][]{
+    private static final @NotNull byte[][] SHOULD_HAVE_SAME_NUMBER = new byte[][]{
             new byte[]{MapElement.GREEN_OBJECT_INDEX, MapElement.GREEN_HOLE_INDEX},
             new byte[]{MapElement.BLUE_OBJECT_INDEX, MapElement.BLUE_HOLE_INDEX},
             new byte[]{MapElement.YELLOW_OBJECT_INDEX, MapElement.YELLOW_HOLE_INDEX},
@@ -64,15 +71,32 @@ final class Level {
     Level(int height, int width) {
         this.height = height;
         this.width = width;
-        gridElements = new byte[height * width];
+        int numberOfTiles = height * width;
+        gridElements = new byte[numberOfTiles];
         Arrays.fill(gridElements, MapElement.EMPTY_INDEX);
-        gridStrengths = new byte[height * width];
+        gridStrengths = new byte[numberOfTiles];
         Arrays.fill(gridStrengths, (byte) 0);
         basementTiles = new ArrayList[MapElement.NUMBER_OF_ELEMENTS];
-        mapStates = new MapState[height * width * 4];
+        mapStates = new MapState[numberOfTiles];
+        canGoUp = new boolean[numberOfTiles];
+        canGoDown = new boolean[numberOfTiles];
+        canGoLeft = new boolean[numberOfTiles];
+        canGoRight = new boolean[numberOfTiles];
+        Arrays.fill(canGoUp, true);
+        Arrays.fill(canGoDown, true);
+        Arrays.fill(canGoLeft, true);
+        Arrays.fill(canGoRight, true);
+        for (int column = 0; column < width; column++) {
+            canGoUp[column] = false;
+            canGoDown[(height - 1) * width + column] = false;
+        }
+        for (int line = 0; line < height; line++) {
+            canGoLeft[(line * width)] = false;
+            canGoRight[(line * width) + (width - 1)] = false;
+        }
     }
 
-    void validate(LevelParser levelParser) {
+    void validate(@NotNull LevelParser levelParser) {
         Map<Byte, Integer> frequencies = new HashMap<>(MapElement.NUMBER_OF_ELEMENTS);
         for (byte element : gridElements) {
             if (frequencies.containsKey(element)) {
@@ -94,7 +118,7 @@ final class Level {
         processTeleportersTiles(teleporters2Tiles);
     }
 
-    private void processTeleportersTiles(List<Coordinates> teleportersTilesList) {
+    private void processTeleportersTiles(@NotNull List<Coordinates> teleportersTilesList) {
         if (!teleportersTilesList.isEmpty()) {
             Coordinates from = teleportersTilesList.get(0);
             Coordinates to = teleportersTilesList.get(1);
@@ -105,7 +129,7 @@ final class Level {
         }
     }
 
-    private void shouldHaveOne(Map<Byte, Integer> frequencies, byte element, LevelParser levelParser) {
+    private void shouldHaveOne(@NotNull Map<Byte, Integer> frequencies, byte element, @NotNull LevelParser levelParser) {
         if (!frequencies.containsKey(element)) {
             throw new RuntimeException("Element [" + levelParser.elementsToChars.get(element) + "] should be present 1 time but is 0");
         }
@@ -115,7 +139,7 @@ final class Level {
         }
     }
 
-    private void shouldHaveZeroOrTwo(Map<Byte, Integer> frequencies, byte element, LevelParser levelParser) {
+    private void shouldHaveZeroOrTwo(@NotNull Map<Byte, Integer> frequencies, byte element, @NotNull LevelParser levelParser) {
         if (!frequencies.containsKey(element)) {
             return;
         }
@@ -125,7 +149,7 @@ final class Level {
         }
     }
 
-    private void shouldHaveSameNumber(Map<Byte, Integer> frequencies, byte element1, byte element2, LevelParser levelParser) {
+    private void shouldHaveSameNumber(@NotNull Map<Byte, Integer> frequencies, byte element1, byte element2, @NotNull LevelParser levelParser) {
         if (!frequencies.containsKey(element1)) {
             if (frequencies.containsKey(element2)) {
                 throw new RuntimeException("Element [" + levelParser.elementsToChars.get(element1) + "] and [" + levelParser.elementsToChars.get(element2) + "] have not the same frequency");
@@ -162,17 +186,35 @@ final class Level {
 
     void setStrength(byte strength, int line, int column) {
         gridStrengths[(line * width) + column] = strength;
+        if (strength == 0) {
+            canGoDown[line * width + column] = false;
+            canGoUp[line * width + column] = false;
+            canGoRight[line * width + column] = false;
+            canGoLeft[line * width + column] = false;
+            if (line != 0) {
+                canGoDown[((line - 1) * width) + column] = false;
+            }
+            if (line != (height - 1)) {
+                canGoUp[((line + 1) * width) + column] = false;
+            }
+            if (column != 0) {
+                canGoRight[(line * width) + column - 1] = false;
+            }
+            if (column != (width - 1)) {
+                canGoLeft[(line * width) + column + 1] = false;
+            }
+        }
     }
 
-    void setBasement(int basementType, int line, int column) {
+    void setBasement(byte basementType, int line, int column) {
         List<Integer> currentBasementTiles = basementTiles[basementType];
         if (currentBasementTiles == null) {
             currentBasementTiles = new ArrayList<>();
             basementTiles[basementType] = currentBasementTiles;
         }
-        currentBasementTiles.add((line * width) + column);
+        int position = (line * width) + column;
+        currentBasementTiles.add(position);
     }
-
 
     void prepare() {
         int entryPosition = entryLine * width + entryColumn;
