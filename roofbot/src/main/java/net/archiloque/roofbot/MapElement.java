@@ -13,11 +13,14 @@ class MapElement {
     final static byte FAN_INDEX = EXIT_INDEX + 1;
     final static byte TELEPORTER_1_INDEX = FAN_INDEX + 1;
     final static byte TELEPORTER_2_INDEX = TELEPORTER_1_INDEX + 1;
+    final static byte TELEPORTER_3_INDEX = TELEPORTER_2_INDEX + 1;
+    final static byte TELEPORTER_4_INDEX = TELEPORTER_3_INDEX + 1;
 
-    final static byte TRIGGER_1_INDEX = TELEPORTER_2_INDEX + 1;
+    final static byte TRIGGER_1_INDEX = TELEPORTER_4_INDEX + 1;
     final static byte TRIGGER_2_INDEX = TRIGGER_1_INDEX + 1;
+    final static byte TRIGGER_3_INDEX = TRIGGER_2_INDEX + 1;
 
-    final static byte GREEN_OBJECT_INDEX = TRIGGER_2_INDEX + 1;
+    final static byte GREEN_OBJECT_INDEX = TRIGGER_3_INDEX + 1;
     final static byte BLUE_OBJECT_INDEX = GREEN_OBJECT_INDEX + 1;
     final static byte YELLOW_OBJECT_INDEX = BLUE_OBJECT_INDEX + 1;
     final static byte RED_OBJECT_INDEX = YELLOW_OBJECT_INDEX + 1;

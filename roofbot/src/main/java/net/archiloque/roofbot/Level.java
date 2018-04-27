@@ -8,6 +8,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static net.archiloque.roofbot.MapElement.BLUE_HOLE_INDEX;
+import static net.archiloque.roofbot.MapElement.BLUE_OBJECT_INDEX;
+import static net.archiloque.roofbot.MapElement.EMPTY_INDEX;
+import static net.archiloque.roofbot.MapElement.ENTRY_INDEX;
+import static net.archiloque.roofbot.MapElement.EXIT_INDEX;
+import static net.archiloque.roofbot.MapElement.GREEN_HOLE_INDEX;
+import static net.archiloque.roofbot.MapElement.GREEN_OBJECT_INDEX;
+import static net.archiloque.roofbot.MapElement.HOLES;
+import static net.archiloque.roofbot.MapElement.NUMBER_OF_ELEMENTS;
+import static net.archiloque.roofbot.MapElement.RED_HOLE_INDEX;
+import static net.archiloque.roofbot.MapElement.RED_OBJECT_INDEX;
+import static net.archiloque.roofbot.MapElement.TELEPORTER_1_INDEX;
+import static net.archiloque.roofbot.MapElement.TELEPORTER_2_INDEX;
+import static net.archiloque.roofbot.MapElement.TELEPORTER_3_INDEX;
+import static net.archiloque.roofbot.MapElement.TELEPORTER_4_INDEX;
+import static net.archiloque.roofbot.MapElement.YELLOW_HOLE_INDEX;
+import static net.archiloque.roofbot.MapElement.YELLOW_OBJECT_INDEX;
+
 final class Level {
 
     final int height;
@@ -45,27 +63,32 @@ final class Level {
 
     private final @NotNull List<Coordinates> teleporters1Tiles = new ArrayList<>();
     private final @NotNull List<Coordinates> teleporters2Tiles = new ArrayList<>();
-    final @NotNull Map<Integer, Coordinates> teleporters = new HashMap<>();
+    private final @NotNull List<Coordinates> teleporters3Tiles = new ArrayList<>();
+    private final @NotNull List<Coordinates> teleporters4Tiles = new ArrayList<>();
+
+    final @NotNull Map<Integer, Integer> teleporters = new HashMap<>();
     final @NotNull boolean[] canGoUp;
     final @NotNull boolean[] canGoDown;
     final @NotNull boolean[] canGoLeft;
     final @NotNull boolean[] canGoRight;
 
     private static final @NotNull byte[] SHOULD_HAVE_ONE = new byte[]{
-            MapElement.ENTRY_INDEX,
-            MapElement.EXIT_INDEX,
+            ENTRY_INDEX,
+            EXIT_INDEX,
     };
 
     private static final @NotNull byte[] SHOULD_HAVE_ZERO_OR_TWO = new byte[]{
-            MapElement.TELEPORTER_1_INDEX,
-            MapElement.TELEPORTER_2_INDEX,
+            TELEPORTER_1_INDEX,
+            TELEPORTER_2_INDEX,
+            TELEPORTER_3_INDEX,
+            TELEPORTER_4_INDEX,
     };
 
     private static final @NotNull byte[][] SHOULD_HAVE_SAME_NUMBER = new byte[][]{
-            new byte[]{MapElement.GREEN_OBJECT_INDEX, MapElement.GREEN_HOLE_INDEX},
-            new byte[]{MapElement.BLUE_OBJECT_INDEX, MapElement.BLUE_HOLE_INDEX},
-            new byte[]{MapElement.YELLOW_OBJECT_INDEX, MapElement.YELLOW_HOLE_INDEX},
-            new byte[]{MapElement.RED_OBJECT_INDEX, MapElement.RED_HOLE_INDEX},
+            new byte[]{GREEN_OBJECT_INDEX, GREEN_HOLE_INDEX},
+            new byte[]{BLUE_OBJECT_INDEX, BLUE_HOLE_INDEX},
+            new byte[]{YELLOW_OBJECT_INDEX, YELLOW_HOLE_INDEX},
+            new byte[]{RED_OBJECT_INDEX, RED_HOLE_INDEX},
     };
 
     Level(int height, int width) {
@@ -73,10 +96,10 @@ final class Level {
         this.width = width;
         int numberOfTiles = height * width;
         gridElements = new byte[numberOfTiles];
-        Arrays.fill(gridElements, MapElement.EMPTY_INDEX);
+        Arrays.fill(gridElements, EMPTY_INDEX);
         gridStrengths = new byte[numberOfTiles];
         Arrays.fill(gridStrengths, (byte) 0);
-        basementTiles = new ArrayList[MapElement.NUMBER_OF_ELEMENTS];
+        basementTiles = new ArrayList[NUMBER_OF_ELEMENTS];
         mapStates = new MapState[numberOfTiles];
         canGoUp = new boolean[numberOfTiles];
         canGoDown = new boolean[numberOfTiles];
@@ -97,7 +120,7 @@ final class Level {
     }
 
     void validate(@NotNull LevelParser levelParser) {
-        Map<Byte, Integer> frequencies = new HashMap<>(MapElement.NUMBER_OF_ELEMENTS);
+        Map<Byte, Integer> frequencies = new HashMap<>(NUMBER_OF_ELEMENTS);
         for (byte element : gridElements) {
             if (frequencies.containsKey(element)) {
                 frequencies.put(element, frequencies.get(element) + 1);
@@ -116,6 +139,8 @@ final class Level {
         }
         processTeleportersTiles(teleporters1Tiles);
         processTeleportersTiles(teleporters2Tiles);
+        processTeleportersTiles(teleporters3Tiles);
+        processTeleportersTiles(teleporters4Tiles);
     }
 
     private void processTeleportersTiles(@NotNull List<Coordinates> teleportersTilesList) {
@@ -124,8 +149,8 @@ final class Level {
             Coordinates to = teleportersTilesList.get(1);
             Integer fromInteger = (from.line * width) + from.column;
             Integer toInteger = (to.line * width) + to.column;
-            teleporters.put(fromInteger, to);
-            teleporters.put(toInteger, from);
+            teleporters.put(fromInteger, toInteger);
+            teleporters.put(toInteger, fromInteger);
         }
     }
 
@@ -168,18 +193,22 @@ final class Level {
 
     void setElement(byte mapElement, byte line, byte column) {
         gridElements[(line * width) + column] = mapElement;
-        if (mapElement == MapElement.ENTRY_INDEX) {
+        if (mapElement == ENTRY_INDEX) {
             entryLine = line;
             entryColumn = column;
-        } else if (mapElement == MapElement.EXIT_INDEX) {
+        } else if (mapElement == EXIT_INDEX) {
             exitLine = line;
             exitColumn = column;
-        } else if (mapElement == MapElement.TELEPORTER_1_INDEX) {
+        } else if (mapElement == TELEPORTER_1_INDEX) {
             teleporters1Tiles.add(new Coordinates(line, column));
-        } else if (mapElement == MapElement.TELEPORTER_2_INDEX) {
+        } else if (mapElement == TELEPORTER_2_INDEX) {
             teleporters2Tiles.add(new Coordinates(line, column));
+        } else if (mapElement == TELEPORTER_3_INDEX) {
+            teleporters3Tiles.add(new Coordinates(line, column));
+        } else if (mapElement == TELEPORTER_4_INDEX) {
+            teleporters4Tiles.add(new Coordinates(line, column));
         }
-        if (MapElement.HOLES.contains(mapElement)) {
+        if (HOLES.contains(mapElement)) {
             numberOfElements++;
         }
     }
@@ -228,7 +257,7 @@ final class Level {
         MapState mapState = new MapState(
                 this,
                 entryPosition,
-                MapElement.EMPTY_INDEX,
+                EMPTY_INDEX,
                 initialGridStrengths,
                 numberOfElements,
                 new CoordinatesLinkedItem(entryPosition, null)

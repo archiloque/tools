@@ -19,8 +19,11 @@ import static net.archiloque.roofbot.MapElement.RED_HOLE_INDEX;
 import static net.archiloque.roofbot.MapElement.RED_OBJECT_INDEX;
 import static net.archiloque.roofbot.MapElement.TELEPORTER_1_INDEX;
 import static net.archiloque.roofbot.MapElement.TELEPORTER_2_INDEX;
+import static net.archiloque.roofbot.MapElement.TELEPORTER_3_INDEX;
+import static net.archiloque.roofbot.MapElement.TELEPORTER_4_INDEX;
 import static net.archiloque.roofbot.MapElement.TRIGGER_1_INDEX;
 import static net.archiloque.roofbot.MapElement.TRIGGER_2_INDEX;
+import static net.archiloque.roofbot.MapElement.TRIGGER_3_INDEX;
 import static net.archiloque.roofbot.MapElement.YELLOW_HOLE_INDEX;
 import static net.archiloque.roofbot.MapElement.YELLOW_OBJECT_INDEX;
 
@@ -101,7 +104,7 @@ final class MapState {
      * @return true if the current state is winning, false elsewhere
      */
     boolean processState() {
-        if(level.gridElements[playerPosition] == EXIT_INDEX) {
+        if (level.gridElements[playerPosition] == EXIT_INDEX) {
             return numberOfUnfilledElements == 0;
         } else {
             addAvailableDirections();
@@ -118,40 +121,35 @@ final class MapState {
             CoordinatesLinkedItem path
     ) {
         int newTargetPosition;
-
         switch (direction) {
             case Direction.UP: {
-                byte targetLineU = (byte) (targetPosition / level.width);
-                if (targetLineU == 0) {
-                    return null;
-                } else {
+                if (level.canGoUp[targetPosition]) {
                     newTargetPosition = targetPosition - level.width;
                     break;
+                } else {
+                    return null;
                 }
             }
             case Direction.DOWN:
-                byte targetLineD = (byte) (targetPosition / level.width);
-                if (targetLineD == (level.height - 1)) {
-                    return null;
-                } else {
+                if (level.canGoDown[targetPosition]) {
                     newTargetPosition = targetPosition + level.width;
                     break;
+                } else {
+                    return null;
                 }
             case Direction.LEFT:
-                byte targetColumnL = (byte) (targetPosition % level.width);
-                if (targetColumnL == 0) {
-                    return null;
-                } else {
+                if (level.canGoLeft[targetPosition]) {
                     newTargetPosition = targetPosition - 1;
                     break;
+                } else {
+                    return null;
                 }
             case Direction.RIGHT:
-                byte targetColumnR = (byte) (targetPosition % level.width);
-                if (targetColumnR == (level.width - 1)) {
-                    return null;
-                } else {
+                if (level.canGoRight[targetPosition]) {
                     newTargetPosition = targetPosition + 1;
                     break;
+                } else {
+                    return null;
                 }
             default:
                 throw new RuntimeException("Unknown direction " + direction);
@@ -183,7 +181,7 @@ final class MapState {
 
         byte targetPositionContent = level.gridElements[targetPosition];
         // try to escape early of we can't go there
-        if(! CAN_GO[targetCurrentObject * NUMBER_OF_ELEMENTS + targetPositionContent]) {
+        if (!CAN_GO[targetCurrentObject * NUMBER_OF_ELEMENTS + targetPositionContent]) {
             return null;
         }
 
@@ -231,8 +229,13 @@ final class MapState {
                     targetGridStrengths[basementTile] = (byte) 1;
                 }
                 break;
+            case TRIGGER_3_INDEX:
+                for (Integer basementTile : level.basementTiles[targetPositionContent]) {
+                    targetGridStrengths[basementTile] = (byte) 1;
+                }
+                break;
             case EXIT_INDEX:
-                if(targetNumberOfUnfilledElements != 0) {
+                if (targetNumberOfUnfilledElements != 0) {
                     return null;
                 }
                 break;
@@ -245,12 +248,12 @@ final class MapState {
                         targetNumberOfUnfilledElements,
                         path);
             case TELEPORTER_1_INDEX:
-                if(direction != Direction.TELEPORT) {
+                if (direction != Direction.TELEPORT) {
                     // teleport if we didn't already teleported there
-                    Coordinates teleporterExit = level.teleporters.get(targetPosition);
+                    int teleporterExit = level.teleporters.get(targetPosition);
                     return tryToGo(
                             Direction.TELEPORT,
-                            teleporterExit.line * level.width + teleporterExit.column,
+                            teleporterExit,
                             targetGridStrengths,
                             targetCurrentObject,
                             targetNumberOfUnfilledElements,
@@ -260,12 +263,12 @@ final class MapState {
                 }
                 break;
             case TELEPORTER_2_INDEX:
-                if(direction != Direction.TELEPORT) {
+                if (direction != Direction.TELEPORT) {
                     // teleport if we didn't already teleported there
-                    Coordinates teleporterExit = level.teleporters.get(targetPosition);
+                    int teleporterExit = level.teleporters.get(targetPosition);
                     return tryToGo(
                             Direction.TELEPORT,
-                            teleporterExit.line * level.width + teleporterExit.column,
+                            teleporterExit,
                             targetGridStrengths,
                             targetCurrentObject,
                             targetNumberOfUnfilledElements,
@@ -274,7 +277,36 @@ final class MapState {
 
                 }
                 break;
-        }
+            case TELEPORTER_3_INDEX:
+                if (direction != Direction.TELEPORT) {
+                    // teleport if we didn't already teleported there
+                    int teleporterExit = level.teleporters.get(targetPosition);
+                    return tryToGo(
+                            Direction.TELEPORT,
+                            teleporterExit,
+                            targetGridStrengths,
+                            targetCurrentObject,
+                            targetNumberOfUnfilledElements,
+                            new CoordinatesLinkedItem(targetPosition, path)
+                    );
+
+                }
+                break;
+            case TELEPORTER_4_INDEX:
+                if (direction != Direction.TELEPORT) {
+                    // teleport if we didn't already teleported there
+                    int teleporterExit = level.teleporters.get(targetPosition);
+                    return tryToGo(
+                            Direction.TELEPORT,
+                            teleporterExit,
+                            targetGridStrengths,
+                            targetCurrentObject,
+                            targetNumberOfUnfilledElements,
+                            new CoordinatesLinkedItem(targetPosition, path)
+                    );
+
+                }
+                break;        }
 
         return new MapState(
                 level,
@@ -289,11 +321,11 @@ final class MapState {
     private void addAvailableDirections() {
         // checkPathForDebug();
         {
-            if(level.canGoUp[playerPosition]) {
-                int targetPositionUp = playerPosition - level.width;
+            // up
+            if (level.canGoUp[playerPosition]) {
                 MapState mapState = tryToGo(
                         Direction.UP,
-                        targetPositionUp,
+                        playerPosition - level.width,
                         null,
                         currentObject,
                         numberOfUnfilledElements,
@@ -307,10 +339,9 @@ final class MapState {
         {
             // down
             if (level.canGoDown[playerPosition]) {
-                int targetPositionDown = playerPosition + level.width;
                 MapState mapState = tryToGo(
                         Direction.DOWN,
-                        targetPositionDown,
+                        playerPosition + level.width,
                         null,
                         currentObject,
                         numberOfUnfilledElements,
@@ -325,10 +356,9 @@ final class MapState {
         {
             // left
             if (level.canGoLeft[playerPosition]) {
-                int targetPositionLeft = playerPosition - 1;
                 MapState mapState = tryToGo(
                         Direction.LEFT,
-                        targetPositionLeft,
+                        playerPosition - 1,
                         null,
                         currentObject,
                         numberOfUnfilledElements,
@@ -343,10 +373,9 @@ final class MapState {
         {
             // right
             if (level.canGoRight[playerPosition]) {
-                int targetPositionRight = playerPosition + 1;
                 MapState mapState = tryToGo(
                         Direction.RIGHT,
-                        targetPositionRight,
+                        playerPosition + 1,
                         null,
                         currentObject,
                         numberOfUnfilledElements,

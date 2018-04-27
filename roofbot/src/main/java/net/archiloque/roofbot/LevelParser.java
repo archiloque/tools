@@ -15,9 +15,12 @@ final class LevelParser {
 
     private static final char TELPORTER_1_CHAR = 'T';
     private static final char TELPORTER_2_CHAR = 'U';
+    private static final char TELPORTER_3_CHAR = 'V';
+    private static final char TELPORTER_4_CHAR = 'W';
     
     private static final char TRIGGER_1_CHAR = '⊤';
     private static final char TRIGGER_2_CHAR = '⊥';
+    private static final char TRIGGER_3_CHAR = '⊣';
 
     private static final char GREEN_OBJECT = 'G';
     private static final char GREEN_HOLE = 'g';
@@ -44,9 +47,12 @@ final class LevelParser {
         addElement(FAN_CHAR, MapElement.FAN_INDEX);
         addElement(TELPORTER_1_CHAR, MapElement.TELEPORTER_1_INDEX);
         addElement(TELPORTER_2_CHAR, MapElement.TELEPORTER_2_INDEX);
+        addElement(TELPORTER_3_CHAR, MapElement.TELEPORTER_3_INDEX);
+        addElement(TELPORTER_4_CHAR, MapElement.TELEPORTER_4_INDEX);
         
         addElement(TRIGGER_1_CHAR, MapElement.TRIGGER_1_INDEX);
         addElement(TRIGGER_2_CHAR, MapElement.TRIGGER_2_INDEX);
+        addElement(TRIGGER_3_CHAR, MapElement.TRIGGER_3_INDEX);
         
         addElement(GREEN_OBJECT, MapElement.GREEN_OBJECT_INDEX);
         addElement(GREEN_HOLE, MapElement.GREEN_HOLE_INDEX);
@@ -65,6 +71,7 @@ final class LevelParser {
         charsToStrength.put('2', (byte) 2);
         charsToBasement.put(TRIGGER_1_CHAR, MapElement.TRIGGER_1_INDEX);
         charsToBasement.put(TRIGGER_2_CHAR,  MapElement.TRIGGER_2_INDEX);
+        charsToBasement.put(TRIGGER_3_CHAR,  MapElement.TRIGGER_3_INDEX);
     }
     
     private void addElement(char character, byte index) {
