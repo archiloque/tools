@@ -98,12 +98,12 @@ final class LevelParser {
             }
         }
 
-        for (int lineIndex = 0; lineIndex < strengths.length; lineIndex++) {
+        for (byte lineIndex = 0; lineIndex < strengths.length; lineIndex++) {
             String line = strengths[lineIndex];
             if (line.length() != columnsNumber) {
                 throw new RuntimeException("Line " + lineIndex + " with content [" + line + "] is " + line.length() + " instead of " + columnsNumber + " like the first line");
             }
-            for (int columnIndex = 0; columnIndex < columnsNumber; columnIndex++) {
+            for (byte columnIndex = 0; columnIndex < columnsNumber; columnIndex++) {
                 Character elementChar = line.charAt(columnIndex);
                 Byte elementStrength = charsToStrength.get(elementChar);
                 if (elementStrength != null) {

@@ -184,25 +184,29 @@ final class Level {
         }
     }
 
-    void setStrength(byte strength, int line, int column) {
+    void setStrength(byte strength, byte line, byte column) {
         gridStrengths[(line * width) + column] = strength;
         if (strength == 0) {
-            canGoDown[line * width + column] = false;
-            canGoUp[line * width + column] = false;
-            canGoRight[line * width + column] = false;
-            canGoLeft[line * width + column] = false;
-            if (line != 0) {
-                canGoDown[((line - 1) * width) + column] = false;
-            }
-            if (line != (height - 1)) {
-                canGoUp[((line + 1) * width) + column] = false;
-            }
-            if (column != 0) {
-                canGoRight[(line * width) + column - 1] = false;
-            }
-            if (column != (width - 1)) {
-                canGoLeft[(line * width) + column + 1] = false;
-            }
+            blackoutBlock(line, column);
+        }
+    }
+
+    private void blackoutBlock(byte line, byte column) {
+        canGoDown[line * width + column] = false;
+        canGoUp[line * width + column] = false;
+        canGoRight[line * width + column] = false;
+        canGoLeft[line * width + column] = false;
+        if (line != 0) {
+            canGoDown[((line - 1) * width) + column] = false;
+        }
+        if (line != (height - 1)) {
+            canGoUp[((line + 1) * width) + column] = false;
+        }
+        if (column != 0) {
+            canGoRight[(line * width) + column - 1] = false;
+        }
+        if (column != (width - 1)) {
+            canGoLeft[(line * width) + column + 1] = false;
         }
     }
 
