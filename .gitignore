@@ -4,3 +4,5 @@ cosmic_express/target
 images_duplications/images
 nucleaire/files
 roofbot/target
+acm_queue/data
+acm_queue/output
