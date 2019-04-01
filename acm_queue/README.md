@@ -14,4 +14,4 @@ How to use it :
 
 Ping me if you need any help.
 
-Cod releasedunder MIT license
+Code released under MIT license
