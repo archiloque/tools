@@ -2,7 +2,7 @@
 
 As the source html pages are a bit hacky and contains some manual formatting the result is 98% OK: perfectly readable but not perfect.
 
-Use the incredible link:http://asciidoctor.org[Asciidoctor].
+Use the incredible [Asciidoctor](http://asciidoctor.org).
 
 Requirements
 - Ruby
