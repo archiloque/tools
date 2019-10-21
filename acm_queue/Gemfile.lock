@@ -4,19 +4,21 @@ GEM
     addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
     asciidoctor (1.5.8)
-    asciidoctor-epub3 (1.5.0.alpha.8)
-      asciidoctor (~> 1.5.0)
-      gepub (~> 0.6.9.2)
+    asciidoctor-epub3 (1.5.0.alpha.9)
+      asciidoctor (>= 1.5.0, < 3.0.0)
+      concurrent-ruby (~> 1.1.5)
+      gepub (~> 1.0.2)
       thread_safe (~> 0.3.6)
+    concurrent-ruby (1.1.5)
     curb (0.9.9)
-    gepub (0.6.9.2)
-      nokogiri (~> 1.6.1)
+    gepub (1.0.4)
+      nokogiri (>= 1.8.2, < 1.11)
       rubyzip (>= 1.1.1)
-    mini_portile2 (2.1.0)
-    nokogiri (1.6.8.1)
-      mini_portile2 (~> 2.1.0)
+    mini_portile2 (2.4.0)
+    nokogiri (1.10.4)
+      mini_portile2 (~> 2.4.0)
     public_suffix (3.0.3)
-    rubyzip (1.2.2)
+    rubyzip (2.0.0)
     thread_safe (0.3.6)
 
 PLATFORMS
@@ -25,9 +27,9 @@ PLATFORMS
 DEPENDENCIES
   addressable (~> 2.6.0)
   asciidoctor (~> 1.5.8)
-  asciidoctor-epub3 (~> 1.5.0.alpha.8)
+  asciidoctor-epub3 (~> 1.5.0.alpha.9)
   curb (~> 0.9.9)
-  nokogiri (~> 1.6.1)
+  nokogiri (~> 1.10.4)
 
 BUNDLED WITH
    1.17.2
