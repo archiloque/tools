@@ -7,6 +7,7 @@ Copyright (c) 2009-2011 Julien Kirch
 ***
 
 * cbz.rb: create fixed-size bcz files from images zip and cbz files
+* cohost: script for cohost, a social network
 * echo_chamber: calculate some stats from your twitter account 
 * flattener.rb: flatten a directory tree by adding the directory names to the files
 * parallel_downloader.rb: download a list of files from their url in parallel
